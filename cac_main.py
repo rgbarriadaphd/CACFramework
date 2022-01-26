@@ -13,7 +13,14 @@ import logging
 from constants.app_constants import *
 from actions.model_train import ModelTrain
 
+
 def request_param(param, args):
+    """
+    Provides requested parameter if exists in the argument list
+    :param param: (str) Requested parameter
+    :param args: (list) list of parameters
+    :return: parameter value, None otherwise
+    """
     for arg in args:
         if param in arg:
             return arg.split('=')[1]
@@ -21,6 +28,10 @@ def request_param(param, args):
 
 
 def model_train(args):
+    """
+    Initializes train stage
+    :param args: (list) list of parameters
+    """
     # Print models folder size
     if not args:
         display_help()
@@ -29,7 +40,7 @@ def model_train(args):
     value = request_param('model', args)
     model = value if value and value in SUPPORTED_MODELS else 'vgg16'
 
-    value = request_param('input', args)
+    value = request_param('dataset', args)
     dataset = value if value and value in SUPPORTED_DATASET else 'cropped'
 
     logging.info(f'Launching TRAIN step with model: {model} over dataset: {dataset}')
@@ -39,18 +50,29 @@ def model_train(args):
 
 
 def model_test(args):
+    """
+    Initializes test stage
+    :param args: (list) list of parameters
+    """
     if not args:
         display_help()
         return
 
+    value = request_param('dataset', args)
+    dataset = value if value and value in SUPPORTED_DATASET else 'cropped'
+
     model = request_param('model', args)
     if os.path.exists(model):
-        logging.info(f'Launching TEST step of model stored in: {model}')
+        logging.info(f'Launching TEST step of model stored in: {model} over dataset {dataset}')
     else:
         logging.info(f'Model: {model} cannot be found')
 
 
 def model_experiment(args):
+    """
+    Initializes experiments stage
+    :param args: (list) list of parameters
+    """
     if not args:
         display_help()
         return
@@ -68,6 +90,9 @@ def model_experiment(args):
 
 
 def display_help():
+    """
+    Prints usage information
+    """
     msg = "CAC Framework\n" \
           "==========================\n" \
           "usage: python cac_main.py action [options]\n" \
@@ -80,14 +105,19 @@ def display_help():
           "  -test | -ts: test trained model.\n" \
           "    [options]:\n" \
           "      model=<model_folder>: model folder root\n" \
+          "      dataset=[original|cropped]: Select input dataset.\n" \
           "  -experiments | -ex: Launch specific experiment over a certain train model.\n" \
           "    [options]:\n" \
           "      model=<model_folder>: model folder root\n" \
           "      id=[1|2|3|4|5]: Select experiment id.\n"
-    logging.info(msg)
+    print(msg)
 
 
 def cac_main(args):
+    """
+    Process input arguments and launch corresponding action
+    :param args: (list) list of parameters
+    """
     logging.basicConfig(level=logging.INFO, format='[%(levelname)s] : %(message)s')
 
     logging.info("Estamos dentro")
@@ -108,5 +138,6 @@ def cac_main(args):
 
 if __name__ == '__main__':
     cac_main(sys.argv)
+
 
 
