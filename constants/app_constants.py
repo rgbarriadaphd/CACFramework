@@ -9,6 +9,6 @@ Description: constants definition related to app behaviour
 
 MIN_ARGS = 2                                            # Minimum number of input args
 MAX_ARGS = 4                                            # Maximum number of input args
-SUPPORTED_MODELS = ['vgg16', 'vgg19', 'resnet']         # List of supported pretrained models
-SUPPORTED_DATASET = ['original', 'cropped']             # List of supported input datasets
+SUPPORTED_ARCHITECTURES = ['vgg16', 'vgg19', 'resnet']         # List of supported pretrained models
+SUPPORTED_IMAGES = ['original', 'cropped']             # List of supported input datasets
 
