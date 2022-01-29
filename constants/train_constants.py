@@ -7,11 +7,15 @@
 Description: constants definition related to the training stage
 """
 
-# Train hyperparamteres
+# Train hyperparameters
+# =======================
+
 EPOCHS = 30
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0001
 
-
-# Fix seed to generate always deterministic results (same random numbers)
-MODEL_SEED = True
+# Architecture parameters
+# =======================
+MODEL_SEED = True  # Fix seed to generate always deterministic results (same random numbers)
+N_CLASSES = 2  # Number of classes (CAC>400, CAC<400)
+CUSTOM_NORMALIZED = True  # Retrieve normalization parameters by analysing input train images

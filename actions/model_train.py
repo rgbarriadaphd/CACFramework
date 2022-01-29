@@ -8,12 +8,17 @@ Description: Class to handle train stages
 """
 import logging
 import torch
+import time
+from copy import copy
+
 import datetime
 
 from constants.path_constants import *
 from constants.train_constants import *
 
-from ultils.fold_handler import FoldHandler
+from utils.fold_handler import FoldHandler
+from utils.cnn import Architecture
+from utils.load_dataset import get_custom_normalization
 
 
 class ModelTrain:
@@ -73,22 +78,23 @@ class ModelTrain:
         Gathers model architecture
         :return:
         """
-        self._model = get_model(self._architecture, seed=MODEL_SEED)
+        architecture = Architecture(self._architecture, seed=MODEL_SEED)
+        self._model = architecture.get()
 
+    @staticmethod
     def _get_normalization(self):
+        """
+        Retrieves custom normalization if defined.
+        :return: ((list) mean, (list) std) Normalized mean and std according to train dataset
+        """
         # Generate custom mean and std normalization values from only train dataset
-        if CUSTOM_NORMALIZED:
-            logging.info(f'Custom image normalization')
-            mean, std = get_custom_normalization()
-        else:
-            logging.info(f'Pytorch image normalization')
-            mean = None
-            std = None
+        mean, std = get_custom_normalization() if CUSTOM_NORMALIZED else (None, None)
         return mean, std
 
     def run(self):
-
-
+        """
+        Runs train stage
+        """
         t0 = time.time()
         folds_acc = []
         folds_samples = []
