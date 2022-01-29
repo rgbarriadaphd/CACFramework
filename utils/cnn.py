@@ -16,7 +16,7 @@ from tqdm import tqdm
 import torch.nn as nn
 from torch import optim
 
-from constants.train_constants import N_CLASSES
+from constants.train_constants import *
 
 
 class Architecture:
@@ -82,23 +82,30 @@ class Architecture:
         return self._model
 
 
-def train_model(model, device, train_loader, epochs=1, epoch_split=None, batch_size=4, lr=0.1, test_loader=None):
+def train_model(model, device, train_loader):
+    """
+    Trains the model with input parametrization
+    :param model: (torch) Pytorch model
+    :param device: () Computing device
+    :param train_loader: () Train dataloader containing dataset images
+    :return: train model
+    """
     n_train = len(train_loader.dataset)
     logging.info(f'''Starting training:
-        Epochs:          {epochs}
-        Batch size:      {batch_size}
-        Learning rate:   {lr}
+        Epochs:          {EPOCHS}
+        Batch size:      {BATCH_SIZE}
+        Learning rate:   {LEARNING_RATE}
         Training size:   {n_train}
         Device:          {device.type}
     ''')
-    optimizer = optim.SGD(model.parameters(), lr=lr, weight_decay=4e-2)
+    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     criterion = nn.CrossEntropyLoss()
 
+    # TODO: Parametrize loss convergence function
     losses = []
-    for epoch in range(epochs):
-
+    for epoch in range(EPOCHS):
         model.train(True)
-        with tqdm(total=n_train, desc=f'Epoch {epoch + 1}/{epochs}', unit='img') as pbar:
+        with tqdm(total=n_train, desc=f'Epoch {epoch + 1}/{EPOCHS}', unit='img') as pbar:
             for i, batch in enumerate(train_loader):
                 sample, ground, file_info = batch
                 sample = sample.to(device=device, dtype=torch.float32)
@@ -110,13 +117,9 @@ def train_model(model, device, train_loader, epochs=1, epoch_split=None, batch_s
                 loss.backward()
                 optimizer.step()
 
-                if test_loader and epoch % epoch_split == 0:
-                    pbar.set_postfix(
-                        **{'LR': optimizer.param_groups[0]['lr'], 'loss (batch) ': loss.item(), 'test ': acc_model})
-                else:
-                    pbar.set_postfix(**{'loss (batch) ': loss.item()})
+                pbar.set_postfix(**{'loss (batch) ': loss.item()})
                 pbar.update(sample.shape[0])
-        losses.append(loss.item())
+                losses.append(loss.item())
     return model, losses
 
 

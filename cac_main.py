@@ -48,7 +48,7 @@ def model_train(args, date_time):
 
     logging.info(f'Launching TRAIN step with model: {architecture} over image types: {image_type}')
 
-    mt = ModelTrain(architecture=architecture, images=image_type, datetime=date_time)
+    mt = ModelTrain(architecture=architecture, images=image_type, date_time=date_time)
     mt.run()
 
 

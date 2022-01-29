@@ -10,15 +10,16 @@ import logging
 import torch
 import time
 from copy import copy
-
-import datetime
+from datetime import timedelta
+import numpy as np
+import matplotlib.pyplot as plt
 
 from constants.path_constants import *
 from constants.train_constants import *
 
 from utils.fold_handler import FoldHandler
-from utils.cnn import Architecture
-from utils.load_dataset import get_custom_normalization
+from utils.cnn import Architecture, train_model
+from utils.load_dataset import get_custom_normalization, load_and_transform_data
 
 
 class ModelTrain:
@@ -81,15 +82,41 @@ class ModelTrain:
         architecture = Architecture(self._architecture, seed=MODEL_SEED)
         self._model = architecture.get()
 
-    @staticmethod
     def _get_normalization(self):
         """
         Retrieves custom normalization if defined.
         :return: ((list) mean, (list) std) Normalized mean and std according to train dataset
         """
         # Generate custom mean and std normalization values from only train dataset
-        mean, std = get_custom_normalization() if CUSTOM_NORMALIZED else (None, None)
-        return mean, std
+        self._normalization = get_custom_normalization() if CUSTOM_NORMALIZED else (None, None)
+
+    def _save_loss_plot(self, losses, fold_id):
+        """
+        Plots fold loss evolution
+        :param losses: (list) list of losses
+        :param fold_id: (int) fold id
+        """
+
+        fig, ax = plt.subplots()
+        model = 'vgg16'
+
+        tx = f'Model = {self._architecture}\nEpochs = {EPOCHS}\nBatch size = {BATCH_SIZE}\nLearning rate = {LEARNING_RATE}'
+
+        ax.plot(list(range(len(losses))), losses)
+
+        # these are matplotlib.patch.Patch properties
+        props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+
+        # place a text box in upper left in axes coords
+        ax.text(0.72, 0.95, tx, transform=ax.transAxes, fontsize=8,
+                verticalalignment='top', bbox=props)
+
+        plt.ylabel('loss')
+        plt.xlabel('epochs')
+        plt.title('Loss convergence')
+        plot_path = os.path.join(self._target_model, f'loss_{fold_id}.png')
+        logging.info(f'Saving plot to {plot_path}')
+        plt.savefig(plot_path)
 
     def run(self):
         """
@@ -105,23 +132,23 @@ class ModelTrain:
             train_data, test_data = self._fold_handler.generate_run_set(fold_id)
 
             # At each iteration the model should remain the same, so conditions are equal in each fold.
-            fold_model = copy(model)
-            fold_model.to(device=device)
+            fold_model = copy(self._model)
+            fold_model.to(device=self._device)
 
-            custom_mean, custom_std = self._get_normalization()
+            # Get dataset normalization mean and std
+            self._get_normalization()
 
             train_data_loader = load_and_transform_data(os.path.join(DYNAMIC_RUN_FOLDER, TRAIN),
                                                         batch_size=BATCH_SIZE,
-                                                        data_augmentation=False, mean=custom_mean, std=custom_std)
+                                                        data_augmentation=False,
+                                                        mean=self._normalization[0],
+                                                        std=self._normalization[1])
             t0_fold_train = time.time()
             # train model
             fold_model, losses = train_model(model=fold_model,
-                                             device=device,
+                                             device=self._device,
                                              train_loader=train_data_loader,
-                                             epochs=EPOCHS,
-                                             batch_size=BATCH_SIZE,
-                                             lr=LEARNING_RATE,
-                                             test_loader=None)
+                                             )
 
             tf_fold_train = time.time() - t0_fold_train
 
@@ -142,8 +169,11 @@ class ModelTrain:
             #                      len(train_data_loader.dataset), len(test_data_loader.dataset), custom_mean, custom_std,
             #                      tf_fold_train, tf_fold_test))
 
+            # Generate Loss plot
+            self._save_loss_plot(losses, fold_id)
+
             # Save fold model
-            folder_model_path = os.path.join(target_model, f'model_folder_{fold_id}.pt')
+            folder_model_path = os.path.join(self._target_model, f'model_folder_{fold_id}.pt')
             logging.info(f'Saving folder model to {folder_model_path}')
             torch.save(fold_model.state_dict(), folder_model_path)
 
