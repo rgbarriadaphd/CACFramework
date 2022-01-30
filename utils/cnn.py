@@ -119,7 +119,7 @@ def train_model(model, device, train_loader):
 
                 pbar.set_postfix(**{'loss (batch) ': loss.item()})
                 pbar.update(sample.shape[0])
-                losses.append(loss.item())
+        losses.append(loss.item())
     return model, losses
 
 

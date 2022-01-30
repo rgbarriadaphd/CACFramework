@@ -56,6 +56,15 @@ class CustomImageFolder(datasets.ImageFolder):
         super(CustomImageFolder, self).__init__(dataset, transform=transform)
         self.class_to_idx = {'CACSmenos400': 0, 'CACSmas400': 1}
 
+    def __getitem__(self, index):
+        """
+        Extended method of ImageFolder
+        :param index: (int) image index
+        :return: Image, label and data info
+        """
+        sample, label = super(datasets.ImageFolder, self).__getitem__(index)
+        return sample, label, self.imgs[index]
+
 
 def load_and_transform_data(dataset, batch_size=1, data_augmentation=False, mean=None, std=None):
     """

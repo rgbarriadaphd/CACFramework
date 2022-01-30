@@ -131,6 +131,7 @@ def init_log(date_time, action):
     """
     logging.basicConfig(filename=os.path.join(LOGS_FOLDER, f'{action}_{date_time}.log'), level=logging.INFO,
                         format='[%(levelname)s] : %(message)s')
+    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 def cac_main(args):
     """

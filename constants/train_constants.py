@@ -10,7 +10,7 @@ Description: constants definition related to the training stage
 # Train hyperparameters
 # =======================
 
-EPOCHS = 5
+EPOCHS = 3
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0001
 WEIGHT_DECAY = 4e-2
