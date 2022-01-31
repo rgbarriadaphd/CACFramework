@@ -14,3 +14,5 @@ input/
 logs/
 
 utils/__pycache__/
+
+models/

@@ -39,8 +39,6 @@ class ModelTrain:
         self._generate_fold_data()
         self._init_model()
 
-        logging.info(f'{self._architecture} | {self._images}')
-
     def _create_train_folder(self):
         """
         Creates the folder where output data will be stored
@@ -148,25 +146,46 @@ class ModelTrain:
             # Get dataset normalization mean and std
             self._get_normalization()
 
+            # Train model. Train step over current fold configuration
+            # <--------------------------------------------------------------------->
             train_data_loader = load_and_transform_data(os.path.join(DYNAMIC_RUN_FOLDER, TRAIN),
                                                         batch_size=BATCH_SIZE,
                                                         data_augmentation=False,
                                                         mean=self._normalization[0],
                                                         std=self._normalization[1])
+            # Measure train time
             t0_fold_train = time.time()
-            # train model
             fold_model, losses = train_model(model=fold_model,
                                              device=self._device,
                                              train_loader=train_data_loader,
                                              )
-
             tf_fold_train = time.time() - t0_fold_train
 
+            # Test model. Test step over train model in current fold
+            # <--------------------------------------------------------------------->
+            test_data_loader = load_and_transform_data(os.path.join(DYNAMIC_RUN_FOLDER, TEST), mean=custom_mean,
+                                                       std=custom_std)
+            # Measure test time
+            t0_fold_test = time.time()
+            acc_model = evaluate_model(fold_model, test_data_loader, device)
+            tf_fold_test = time.time() - t0_fold_test
+            folds_acc.append(acc_model)
+
+            # Append fold results to summary
+            self._save_fold_results()
+
             # Generate Loss plot
-            self._save_plot_fold(losses, fold_id)
+            if SAVE_LOSS_PLOT:
+                self._save_plot_fold(losses, fold_id)
 
             # Save fold model
-            self._save_model_fold(fold_model, fold_id)
+            if SAVE_MODEL:
+                self._save_model_fold(fold_model, fold_id)
+
+            # Run only one fold
+            if MONO_FOLD:
+                logging.info("Only one fold is executed")
+                break
 
         # self._save_train_summary()
 

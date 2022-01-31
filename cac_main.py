@@ -11,8 +11,8 @@ import sys
 import logging
 import datetime
 
-from constants.app_constants import *
 from constants.path_constants import *
+from constants.train_constants import *
 from actions.model_train import ModelTrain
 
 
@@ -24,51 +24,19 @@ def request_param(param, args):
     :return: parameter value, None otherwise
     """
     for arg in args:
+        arg = arg[1:] if arg.startswith('-') else arg
         if param in arg:
             return arg.split('=')[1]
     return None
 
 
-def model_train(args, date_time):
+def model_train(date_time):
     """
     Initializes train stage
-    :param args: (list) list of parameters
     :param date_time: (str) date and time to identify execution
     """
-    # Print models folder size
-    if not args:
-        display_help()
-        return
-
-    value = request_param('architecture', args)
-    architecture = value if value and value in SUPPORTED_ARCHITECTURES else 'vgg16'
-
-    value = request_param('images', args)
-    image_type = value if value and value in SUPPORTED_IMAGES else 'cropped'
-
-    logging.info(f'Launching TRAIN step with model: {architecture} over image types: {image_type}')
-
-    mt = ModelTrain(architecture=architecture, images=image_type, date_time=date_time)
+    mt = ModelTrain(architecture=ARCHITECTURE, images=IMAGE_TYPE, date_time=date_time)
     mt.run()
-
-
-def model_test(args):
-    """
-    Initializes test stage
-    :param args: (list) list of parameters
-    """
-    if not args:
-        display_help()
-        return
-
-    value = request_param('images', args)
-    image_type = value if value and value in SUPPORTED_IMAGES else 'cropped'
-
-    model = request_param('model', args)
-    if os.path.exists(model):
-        logging.info(f'Launching TEST step of model stored in: {model} over image types {image_type}')
-    else:
-        logging.info(f'Model: {model} cannot be found')
 
 
 def model_experiment(args):
@@ -85,6 +53,7 @@ def model_experiment(args):
         logging.info(f'Launching TEST step of model stored in: {model}')
     else:
         logging.info(f'Model: {model} cannot be found')
+        return
 
     value = request_param('id', args)
     id_experiment = value if value else '1'
@@ -97,7 +66,8 @@ def get_execution_time():
     :return: The current date and time to identify the whole execution
     """
     date_time = datetime.datetime.now()
-    return str(date_time.date()) + "_" + str(date_time.time().strftime("%H:%M:%S"))
+    return str(date_time.date().strftime('%Y%m%d')) + "_" + str(date_time.time().strftime("%H%M%S"))
+
 
 def display_help():
     """
@@ -105,21 +75,11 @@ def display_help():
     """
     msg = "CAC Framework\n" \
           "==========================\n" \
-          "usage: python cac_main.py action [options]\n" \
-          "[actions]:\n" \
-          "  -help | -h: Display help.\n" \
-          "  -train | -tr: train defined model with input hyperparams.\n" \
-          "    [options]:\n" \
-          "      architecture=[vgg16|vgg19|resnet]: Pretrained model to be trained\n" \
-          "      images=[original|cropped]: Select input dataset.\n" \
-          "  -test | -ts: test trained model.\n" \
-          "    [options]:\n" \
-          "      model=<model_folder>: model folder root\n" \
-          "      dataset=[original|cropped]: Select input dataset.\n" \
-          "  -experiments | -ex: Launch specific experiment over a certain train model.\n" \
-          "    [options]:\n" \
-          "      model=<model_folder>: model folder root\n" \
-          "      id=[1|2|3|4|5]: Select experiment id.\n"
+          "usage: python cac_main.py <options>\n" \
+          "Options:\n" \
+          "  [-help | -h]: Display help.\n" \
+          "  [-train | -tr]: train and test model.\n" \
+          "  [-experiment | -exp] -id=<exp_id> -model=<model_folder>:  test specified model.\n"
     print(msg)
 
 
@@ -133,24 +93,22 @@ def init_log(date_time, action):
                         format='[%(levelname)s] : %(message)s')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
+
 def cac_main(args):
     """
     Process input arguments and launch corresponding action
     :param args: (list) list of parameters
     """
-    date_time = get_execution_time()
-
-    if len(args) < MIN_ARGS or len(args) > MAX_ARGS:
+    if len(args) != 2 and len(args) != 4:
         display_help()
         return
 
+    date_time = get_execution_time()
+
     if args[1] == '-train' or args[1] == '-tr':
         init_log(date_time, 'train')
-        model_train(args[2:], date_time)
-    elif args[1] == '-test' or args[1] == '-ts':
-        init_log(date_time, 'test')
-        model_test(args[2:])
-    elif args[1] == '-experiments' or args[1] == '-ex':
+        model_train(date_time)
+    elif args[1] == '-experiments' or args[1] == '-exp':
         init_log(date_time, 'exp')
         model_experiment(args[2:])
     else:
@@ -160,6 +118,3 @@ def cac_main(args):
 
 if __name__ == '__main__':
     cac_main(sys.argv)
-
-
-
