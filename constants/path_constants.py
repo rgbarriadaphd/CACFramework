@@ -32,3 +32,9 @@ TRAIN = 'train'
 TEST = 'test'
 CAC_NEGATIVE = 'CACSmenos400'
 CAC_POSITIVE = 'CACSmas400'
+
+
+# Templates
+
+SUMMARY_TEMPLATE = 'templates/summary.template'
+assert os.path.exists(SUMMARY_TEMPLATE)

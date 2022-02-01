@@ -1,0 +1,87 @@
+Train Summary Report
+$datetime
+
+=================================
+Global Configuration:
+---------------------
+
+Architecture: $model
+Images: $image_type
+Normalized: $normalized
+Save model: $save_model
+Plot Loss: $plot_loss
+Hyperparams:
+	Epochs: $epochs
+	Batch size: $batch_size
+	Learning rate: $learning_rate
+	Weight Decay: $weight_decay
+	Criterion: $criterion
+	Optimizer: $optimizer
+
+
+=================================
+Fold results:
+---------------------
+
+Fold [1]: train (122) / test (32)
+	Normalization: (mean=[0.485, 0.456, 0.406], std=[0.485, 0.456, 0.406])
+	Elapsed time: train=1812.54, test=0.64
+	Accuracy: 59.78%
+	Precision:
+	Recall:
+	F1:
+	Confusion Matrix:
+
+Fold [2]: train (122) / test (32)
+	Normalization: (mean=[0.485, 0.456, 0.406], std=[0.485, 0.456, 0.406])
+	Elapsed time: train=1812.54, test=0.64
+	Accuracy: 59.78%
+	Precision:
+	Recall:
+	F1:
+	Confusion Matrix:
+
+Fold [3]: train (122) / test (32)
+	Normalization: (mean=[0.485, 0.456, 0.406], std=[0.485, 0.456, 0.406])
+	Elapsed time: train=1812.54, test=0.64
+	Accuracy: 59.78%
+	Precision:
+	Recall:
+	F1:
+	Confusion Matrix:
+
+Fold [4]: train (122) / test (32)
+	Normalization: (mean=[0.485, 0.456, 0.406], std=[0.485, 0.456, 0.406])
+	Elapsed time: train=1812.54, test=0.64
+	Accuracy: 59.78%
+	Precision:
+	Recall:
+	F1:
+	Confusion Matrix:
+
+Fold [5]: train (122) / test (32)
+	Normalization: (mean=[0.485, 0.456, 0.406], std=[0.485, 0.456, 0.406])
+	Elapsed time: train=1812.54, test=0.64
+	Accuracy: 59.78%
+	Precision:
+	Recall:
+	F1:
+	Confusion Matrix:
+
+
+=================================
+Global Performance:
+---------------------
+
+Elapsed total time: 2:35:47. Train: 2:34:08.339924 | Test = 0:00:03.382212
+Folds Acc.: [43.75, 100.0, 100.0, 100.0, 100.0]
+Mean: 88.75
+Stdev: 25.16
+Offset: 22.05
+CI:(95%) : [66.70, 110.80]
+
+
+
+
+
+

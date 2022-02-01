@@ -13,12 +13,13 @@ from copy import copy
 from datetime import timedelta
 import numpy as np
 import matplotlib.pyplot as plt
+from string import Template
 
 from constants.path_constants import *
 from constants.train_constants import *
 
 from utils.fold_handler import FoldHandler
-from utils.cnn import Architecture, train_model
+from utils.cnn import Architecture, train_model, eva
 from utils.load_dataset import get_custom_normalization, load_and_transform_data
 
 
@@ -125,14 +126,61 @@ class ModelTrain:
         plot_path = os.path.join(self._train_folder, f'loss_{fold_id}.png')
         logging.info(f'Saving plot to {plot_path}')
         plt.savefig(plot_path)
+    
+    def _save_train_summary(self, folds_summary):
+
+        # Global Configuration
+        summary_template_values = {
+            'datetime': datetime.datetime.now(),
+            'model': ARCHITECTURE,
+            'image_type': IMAGE_TYPE,
+            'normalized': CUSTOM_NORMALIZED,
+            'save_model': SAVE_MODEL,
+            'plot_loss': SAVE_LOSS_PLOT,
+            'epochs': EPOCHS,
+            'batch_size': BATCH_SIZE,
+            'learning_rate': LEARNING_RATE,
+            'weight_decay': WEIGHT_DECAY,
+            'criterion': CRITERION,
+            'optimizer': OPTIMIZER,
+        }
+        
+        for fold_id, values in folds_summary.items():
+            fold_id
+            Fold[1]: train(122) / test(32)
+            Normalization: (mean=[0.485, 0.456, 0.406], std=[0.485, 0.456, 0.406])
+            Elapsed
+            time: train = 1812.54, test = 0.64
+            Accuracy: 59.78 %
+            Precision:
+            Recall:
+            F1:
+            Confusion
+            Matrix:
+            
+            
+            
+            
+
+        # Append fold results
+        # Append global performance
+
+        # Substitute values
+        with open(SUMMARY_TEMPLATE, 'r') as f:
+            src = Template(f.read())
+            report = src.substitute(summary_template_values)
+            logging.info(report)
+
+        # Write report
+        with open(os.path.join(self._train_folder, 'summary.out'), 'w') as f:
+            f.write(report)
 
     def run(self):
         """
         Runs train stage
         """
         t0 = time.time()
-        folds_acc = []
-        folds_samples = []
+        folds_performance = []
         for fold_id in range(1, 6):
             logging.info(f'Processing fold: {fold_id}')
 
@@ -161,15 +209,16 @@ class ModelTrain:
                                              )
             tf_fold_train = time.time() - t0_fold_train
 
-            # Test model. Test step over train model in current fold
+            # Test model. Test step over the train model in current fold
             # <--------------------------------------------------------------------->
             test_data_loader = load_and_transform_data(os.path.join(DYNAMIC_RUN_FOLDER, TEST), mean=custom_mean,
                                                        std=custom_std)
             # Measure test time
             t0_fold_test = time.time()
-            acc_model = evaluate_model(fold_model, test_data_loader, device)
+            model_performance = evaluate_model(fold_model, test_data_loader, device)
             tf_fold_test = time.time() - t0_fold_test
-            folds_acc.append(acc_model)
+            model_performance
+            folds_performance.append(model_performance)
 
             # Append fold results to summary
             self._save_fold_results()
@@ -187,7 +236,7 @@ class ModelTrain:
                 logging.info("Only one fold is executed")
                 break
 
-        # self._save_train_summary()
+        self._save_train_summary()
 
 
         execution_time = str(timedelta(seconds=time.time() - t0))

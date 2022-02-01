@@ -14,7 +14,8 @@ EPOCHS = 1
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0001
 WEIGHT_DECAY = 4e-2
-
+CRITERION = 'CrossEntropyLoss'
+OPTIMIZER = 'SDG'
 # Architecture parameters
 # =======================
 ARCHITECTURE = 'vgg16'  # model architecture. Supported -->['vgg16', 'vgg19', 'resnet']
