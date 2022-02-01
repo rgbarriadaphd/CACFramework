@@ -10,7 +10,7 @@ import logging
 import torch
 import time
 from copy import copy
-from datetime import timedelta
+from datetime import datetime, timedelta
 import numpy as np
 import matplotlib.pyplot as plt
 from string import Template
@@ -21,6 +21,7 @@ from constants.train_constants import *
 from utils.fold_handler import FoldHandler
 from utils.cnn import Architecture, train_model, evaluate_model
 from utils.load_dataset import get_custom_normalization, load_and_transform_data
+from utils.metrics import CrossValidationMeasures
 
 
 class ModelTrain:
@@ -127,11 +128,11 @@ class ModelTrain:
         logging.info(f'Saving plot to {plot_path}')
         plt.savefig(plot_path)
     
-    def _save_train_summary(self, folds_summary):
+    def _save_train_summary(self, folds_performance, global_performance):
 
         # Global Configuration
         summary_template_values = {
-            'datetime': datetime.datetime.now(),
+            'datetime': datetime.now(),
             'model': ARCHITECTURE,
             'image_type': IMAGE_TYPE,
             'normalized': CUSTOM_NORMALIZED,
@@ -145,25 +146,11 @@ class ModelTrain:
             'optimizer': OPTIMIZER,
         }
         
-        for fold_id, values in folds_summary.items():
-            fold_id
-            Fold[1]: train(122) / test(32)
-            Normalization: (mean=[0.485, 0.456, 0.406], std=[0.485, 0.456, 0.406])
-            Elapsed
-            time: train = 1812.54, test = 0.64
-            Accuracy: 59.78 %
-            Precision:
-            Recall:
-            F1:
-            Confusion
-            Matrix:
-            
-            
-            
-            
-
+        for fold in folds_performance:
+            summary_template_values.update(fold)
         # Append fold results
         # Append global performance
+        summary_template_values.update(global_performance)
 
         # Substitute values
         with open(SUMMARY_TEMPLATE, 'r') as f:
@@ -181,6 +168,7 @@ class ModelTrain:
         """
         t0 = time.time()
         folds_performance = []
+        folds_acc = []
         for fold_id in range(1, 6):
             logging.info(f'Processing fold: {fold_id}')
 
@@ -216,8 +204,9 @@ class ModelTrain:
                                                        std=self._normalization[1])
             # Measure test time
             t0_fold_test = time.time()
-            model_performance = evaluate_model(fold_model, test_data_loader, self._device, fold_id)
+            model_performance, fold_accuracy = evaluate_model(fold_model, test_data_loader, self._device, fold_id)
             tf_fold_test = time.time() - t0_fold_test
+            folds_acc.append(fold_accuracy)
 
             # Update fold data
             fold_data = {
@@ -226,14 +215,11 @@ class ModelTrain:
                 f'n_test_{fold_id}': len(test_data_loader.dataset),
                 f'mean_{fold_id}': self._normalization[0],
                 f'std_{fold_id}': self._normalization[1],
-                f'fold_train_time_{fold_id}': tf_fold_train,
-                f'fold_test_time_{fold_id}': tf_fold_test,
+                f'fold_train_time_{fold_id}': f'{tf_fold_train:.2f}',
+                f'fold_test_time_{fold_id}': f'{tf_fold_test:.2f}',
             }
             model_performance.update(fold_data)
             folds_performance.append(model_performance)
-
-            # Append fold results to summary
-            self._save_fold_results()
 
             # Generate Loss plot
             if SAVE_LOSS_PLOT:
@@ -248,50 +234,14 @@ class ModelTrain:
                 logging.info("Only one fold is executed")
                 break
 
-        self._save_train_summary()
-
-
-        execution_time = str(timedelta(seconds=time.time() - t0))
-
-        # # Confident interval computation
-        # mean, stdev, offset, ci = get_fold_metrics(folds_acc)
-        # # print(f'******************************************')
-        # logging.info(f'Model performance [{execution_time}]:')
-        # logging.info(f'     Folds Acc.: {folds_acc}')
-        # logging.info(f'     Mean: {mean:.2f}')
-        # logging.info(f'     Stdev: {stdev:.2f}')
-        # logging.info(f'     Offset: {offset:.2f}')
-        # logging.info(f'     CI:(95%) : [{ci[0]:.2f}, {ci[1]:.2f}]')
-
-        # # Save model performance
-        # with open(os.path.join(target_model, 'summary.out'), 'w') as f:
-        #     f.write(f'Model hyperparameters::\n')
-        #     f.write(f'     Batch size: {BATCH_SIZE}\n')
-        #     f.write(f'     Nº epochs: {EPOCHS}\n')
-        #     f.write(f'     Learning rate: {LEARNING_RATE}\n')
-        #     f.write(f'     Samples Size:\n')
-        #     for fold_id in range(1, 6):
-        #         f.write(
-        #             f'          Fold [{fold_id}]: train ({folds_samples[fold_id - 1][0]}) / test ({folds_samples[fold_id - 1][1]})\n')
-        #         if custom_mean == None:
-        #             f.write(f'              Normalization: Pytorch defaults\n')
-        #         else:
-        #             f.write(
-        #                 f'              Normalization: mean=[{folds_samples[fold_id - 1][2][0]:.2f},{folds_samples[fold_id - 1][2][1]: .2f},{folds_samples[fold_id - 1][2][2]: .2f}], std=[{folds_samples[fold_id - 1][3][0]:.2f},{folds_samples[fold_id - 1][3][1]: .2f},{folds_samples[fold_id - 1][3][2]: .2f}]\n')
-        #         f.write(
-        #             f'              Elapsed time: train={folds_samples[fold_id - 1][4]:.2f}, test={folds_samples[fold_id - 1][5]:.2f}\n')
-        #
-        #     t_train = 0
-        #     t_test = 0
-        #     for fold_id in range(1, 6):
-        #         t_train += folds_samples[fold_id - 1][4]
-        #         t_test += folds_samples[fold_id - 1][5]
-        #
-        #     f.write(f'Model performance [{execution_time}]:\n')
-        #     f.write(f'     Train = {str(timedelta(seconds=t_train))} | Test = {str(timedelta(seconds=t_test))}\n')
-        #     f.write(f'     Folds Acc.: {folds_acc}\n')
-        #     f.write(f'     Mean: {mean:.2f}\n')
-        #     f.write(f'     Stdev: {stdev:.2f}\n')
-        #     f.write(f'     Offset: {offset:.2f}\n')
-        #     f.write(f'     CI:(95%) : [{ci[0]:.2f}, {ci[1]:.2f}]\n')
+        # Compute global performance info
+        cvm = CrossValidationMeasures(measures_list=folds_acc, percent=True, formatted=True)
+        global_performance = {
+            'execution_time': str(timedelta(seconds=time.time() - t0)),
+            'folds_accuracy': f'[{folds_acc[0]:.2f}, {folds_acc[1]:.2f}, {folds_acc[2]:.2f}, {folds_acc[3]:.2f}, {folds_acc[4]:.2f}]',
+            'cross_v_mean': cvm.mean(),
+            'cross_v_stddev': cvm.stddev(),
+            'cross_v_interval': cvm.interval()
+        }
+        self._save_train_summary(folds_performance, global_performance)
 

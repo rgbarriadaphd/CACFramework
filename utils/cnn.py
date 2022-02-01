@@ -17,6 +17,7 @@ import torch.nn as nn
 from torch import optim
 
 from constants.train_constants import *
+from utils.metrics import PerformanceMetrics
 
 
 class Architecture:
@@ -97,6 +98,8 @@ def train_model(model, device, train_loader):
         Learning rate:   {LEARNING_RATE}
         Training size:   {n_train}
         Device:          {device.type}
+        Criterion:       {CRITERION}
+        Optimizer:       {OPTIMIZER}
     ''')
     # TODO: Parametrize optimizer and criterion
     optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
@@ -131,17 +134,20 @@ def evaluate_model(model, test_loader, device, fold_id):
     :param test_loader: (torchvision.datasets) Test dataloader containing dataset images
     :param device: (torch.cuda.device) Computing device
     :param fold_id: (int) Fold identifier. Just to return data.
-    :return: (dict) mdoel performance including accuracy, precision, recall, F1-measure
+    :return: (dict) model performance including accuracy, precision, recall, F1-measure
             and confusion matrix
     """
     n_test = len(test_loader.dataset)
     logging.info(f'''Starting training:
-            Test size:   {n_test}
-            Device:          {device.type}
+            Test size:  {n_test}
+            Device:     {device.type}
+            Fold ID:    {fold_id}
         ''')
+
     correct = 0
     total = 0
-
+    ground_array = []
+    prediction_array = []
     model.eval()
     with torch.no_grad():
         for i, data in enumerate(test_loader):
@@ -152,6 +158,27 @@ def evaluate_model(model, test_loader, device, fold_id):
             outputs = model(sample)
             _, predicted = torch.max(outputs.data, 1)
 
+            ground_array.append(ground.item())
+            prediction_array.append(predicted.item())
+
             total += ground.size(0)
             correct += (predicted == ground).sum().item()
-    return (100 * correct) / total
+
+    pm = PerformanceMetrics(ground=ground_array,
+                            prediction=prediction_array,
+                            percent=True,
+                            formatted=True)
+    confusion_matrix = pm.confusion_matrix()
+
+    return {
+        f'accuracy_{fold_id}': pm.accuracy(),
+        f'precision_{fold_id}': pm.precision(),
+        f'recall_{fold_id}': pm.recall(),
+        f'f1_{fold_id}': pm.f1(),
+        f'tn_{fold_id}': confusion_matrix[0],
+        f'fp_{fold_id}': confusion_matrix[1],
+        f'fn_{fold_id}': confusion_matrix[2],
+        f'tp_{fold_id}': confusion_matrix[3]
+    }, (100 * correct) / total
+
+

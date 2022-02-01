@@ -90,7 +90,6 @@ class PerformanceMetrics:
     """
     Class to compute model performance
     """
-
     def __init__(self, ground, prediction, percent=False, formatted=False):
         """
         PerformanceMetrics class constructor
@@ -225,9 +224,9 @@ class PerformanceMetrics:
 
 if __name__ == '__main__':
     # Test functions
-    ground = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    prediction = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1]
-    pm = PerformanceMetrics(ground, prediction, percent=True, formatted=True)
+    mground = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    mprediction = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1]
+    pm = PerformanceMetrics(mground, mprediction, percent=True, formatted=True)
     conf_matrix = pm.confusion_matrix()
 
     assert conf_matrix[0] == 17

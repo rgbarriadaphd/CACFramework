@@ -27,5 +27,5 @@ CUSTOM_NORMALIZED = True  # Retrieve normalization parameters by analysing input
 # Output parameters
 # =======================
 SAVE_MODEL = True  # True if model has to be saved
-SAVE_LOSS_PLOT = False  # True if loss plot has to be saved
-MONO_FOLD = True  # Run only one Fold
+SAVE_LOSS_PLOT = True  # True if loss plot has to be saved
+MONO_FOLD = False  # Run only one Fold

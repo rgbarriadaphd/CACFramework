@@ -31,7 +31,7 @@ Fold [$fold_id_1]: train ($n_train_1) / test ($n_test_1)
 	Recall: $recall_1
 	F1: $f1_1
 	Confusion Matrix: $tn_1 , $fp_1
-	                  $fn_1,  $tp_1
+	                  $fn_1 , $tp_1
 
 Fold [$fold_id_2]: train ($n_train_2) / test ($n_test_2)
 	Normalization: (mean=$mean_2, std=$std_2)
@@ -41,7 +41,7 @@ Fold [$fold_id_2]: train ($n_train_2) / test ($n_test_2)
 	Recall: $recall_2
 	F1: $f1_2
 	Confusion Matrix: $tn_2 , $fp_2
-	                  $fn_2,  $tp_2
+	                  $fn_2 , $tp_2
 
 Fold [$fold_id_3]: train ($n_train_3) / test ($n_test_3)
 	Normalization: (mean=$mean_3, std=$std_3)
@@ -51,7 +51,7 @@ Fold [$fold_id_3]: train ($n_train_3) / test ($n_test_3)
 	Recall: $recall_3
 	F1: $f1_3
 	Confusion Matrix: $tn_3 , $fp_3
-	                  $fn_3,  $tp_3
+	                  $fn_3 , $tp_3
 
 Fold [$fold_id_4]: train ($n_train_4) / test ($n_test_4)
 	Normalization: (mean=$mean_4, std=$std_4)
@@ -61,29 +61,28 @@ Fold [$fold_id_4]: train ($n_train_4) / test ($n_test_4)
 	Recall: $recall_4
 	F1: $f1_4
 	Confusion Matrix: $tn_4 , $fp_4
-	                  $fn_4,  $tp_4
+	                  $fn_4 , $tp_4
 
 Fold [$fold_id_5]: train ($n_train_5) / test ($n_test_5)
-	Normalization: (mean=$mean_, std=$std_5)
+	Normalization: (mean=$mean_5, std=$std_5)
 	Elapsed time: train=$fold_train_time_5, test=$fold_test_time_5
 	Accuracy: $accuracy_5
 	Precision: $precision_5
 	Recall: $recall_5
 	F1: $f1_5
 	Confusion Matrix: $tn_5 , $fp_5
-	                  $fn_5,  $tp_5
+	                  $fn_5 , $tp_5
 
 
 =================================
 Global Performance:
 ---------------------
 
-Elapsed total time: 2:35:47. Train: 2:34:08.339924 | Test = 0:00:03.382212
-Folds Acc.: [43.75, 100.0, 100.0, 100.0, 100.0]
-Mean: 88.75
-Stdev: 25.16
-Offset: 22.05
-CI:(95%) : [66.70, 110.80]
+Elapsed total time: $execution_time.
+Folds Acc.: $folds_accuracy
+Mean: $cross_v_mean
+StdDev: $cross_v_stddev
+CI:(95%) : $cross_v_interval
 
 
 

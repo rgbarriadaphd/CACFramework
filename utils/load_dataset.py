@@ -68,9 +68,9 @@ class CustomImageFolder(datasets.ImageFolder):
 def load_and_transform_data(dataset, batch_size=1, data_augmentation=False, mean=None, std=None):
     """
     Loads a dataset and applies the corresponding transformations
-    :param dataset:
-    :param batch_size:
-    :param data_augmentation:
+    :param dataset: (str) Dataset path
+    :param batch_size: (int) number of batch
+    :param data_augmentation: (bool) if data augmentation shall be applied
     :param mean: (list) Normalized mean
     :param std: (list) Normalized std
     """
@@ -83,7 +83,6 @@ def load_and_transform_data(dataset, batch_size=1, data_augmentation=False, mean
         std = [0.229, 0.224, 0.225]
     else:
         logging.info(f'Applying custom normalization: mean={mean}, std={std}')
-
 
     if data_augmentation:
         data_transforms = transforms.Compose([
