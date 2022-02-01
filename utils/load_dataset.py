@@ -12,7 +12,6 @@ import numpy as np
 import logging
 import torch
 from torchvision import datasets, transforms
-from typing import Dict, List, Tuple
 
 from constants.path_constants import DYNAMIC_RUN_FOLDER, TRAIN
 

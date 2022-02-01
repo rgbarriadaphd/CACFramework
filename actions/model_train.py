@@ -19,7 +19,7 @@ from constants.path_constants import *
 from constants.train_constants import *
 
 from utils.fold_handler import FoldHandler
-from utils.cnn import Architecture, train_model, eva
+from utils.cnn import Architecture, train_model, evaluate_model
 from utils.load_dataset import get_custom_normalization, load_and_transform_data
 
 
@@ -209,15 +209,27 @@ class ModelTrain:
                                              )
             tf_fold_train = time.time() - t0_fold_train
 
-            # Test model. Test step over the train model in current fold
+            # Test model. Test step over train model in current fold
             # <--------------------------------------------------------------------->
-            test_data_loader = load_and_transform_data(os.path.join(DYNAMIC_RUN_FOLDER, TEST), mean=custom_mean,
-                                                       std=custom_std)
+            test_data_loader = load_and_transform_data(os.path.join(DYNAMIC_RUN_FOLDER, TEST),
+                                                       mean=self._normalization[0],
+                                                       std=self._normalization[1])
             # Measure test time
             t0_fold_test = time.time()
-            model_performance = evaluate_model(fold_model, test_data_loader, device)
+            model_performance = evaluate_model(fold_model, test_data_loader, self._device, fold_id)
             tf_fold_test = time.time() - t0_fold_test
-            model_performance
+
+            # Update fold data
+            fold_data = {
+                f'fold_id_{fold_id}': fold_id,
+                f'n_train_{fold_id}': len(train_data_loader.dataset),
+                f'n_test_{fold_id}': len(test_data_loader.dataset),
+                f'mean_{fold_id}': self._normalization[0],
+                f'std_{fold_id}': self._normalization[1],
+                f'fold_train_time_{fold_id}': tf_fold_train,
+                f'fold_test_time_{fold_id}': tf_fold_test,
+            }
+            model_performance.update(fold_data)
             folds_performance.append(model_performance)
 
             # Append fold results to summary

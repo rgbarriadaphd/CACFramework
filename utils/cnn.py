@@ -85,9 +85,9 @@ class Architecture:
 def train_model(model, device, train_loader):
     """
     Trains the model with input parametrization
-    :param model: (torch) Pytorch model
-    :param device: () Computing device
-    :param train_loader: () Train dataloader containing dataset images
+    :param model: (torchvision.models) Pytorch model
+    :param device: (torch.cuda.device) Computing device
+    :param train_loader: (torchvision.datasets) Train dataloader containing dataset images
     :return: train model
     """
     n_train = len(train_loader.dataset)
@@ -98,6 +98,7 @@ def train_model(model, device, train_loader):
         Training size:   {n_train}
         Device:          {device.type}
     ''')
+    # TODO: Parametrize optimizer and criterion
     optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     criterion = nn.CrossEntropyLoss()
 
@@ -123,8 +124,17 @@ def train_model(model, device, train_loader):
     return model, losses
 
 
-def evaluate_model(model, dataloader, device):
-    n_test = len(dataloader.dataset)
+def evaluate_model(model, test_loader, device, fold_id):
+    """
+    Test the model with input parametrization
+    :param model: (torch) Pytorch model
+    :param test_loader: (torchvision.datasets) Test dataloader containing dataset images
+    :param device: (torch.cuda.device) Computing device
+    :param fold_id: (int) Fold identifier. Just to return data.
+    :return: (dict) mdoel performance including accuracy, precision, recall, F1-measure
+            and confusion matrix
+    """
+    n_test = len(test_loader.dataset)
     logging.info(f'''Starting training:
             Test size:   {n_test}
             Device:          {device.type}
@@ -134,7 +144,7 @@ def evaluate_model(model, dataloader, device):
 
     model.eval()
     with torch.no_grad():
-        for i, data in enumerate(dataloader):
+        for i, data in enumerate(test_loader):
             sample, ground, file_info = data
             sample = sample.to(device=device)
             ground = ground.to(device=device)
