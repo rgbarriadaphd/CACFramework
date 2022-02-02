@@ -20,7 +20,7 @@ OPTIMIZER = 'SDG'
 # =======================
 ARCHITECTURE = 'vgg16'  # model architecture. Supported -->['vgg16', 'vgg19', 'resnet']
 IMAGE_TYPE = 'cropped'  # Input datset type. Supported --> ['original', 'cropped']
-MODEL_SEED = True  # Fix seed to generate always deterministic results (same random numbers)
+MODEL_SEED = 3  # Fix seed to generate always deterministic results (same random numbers)
 N_CLASSES = 2  # Number of classes (CAC>400, CAC<400)
 CUSTOM_NORMALIZED = True  # Retrieve normalization parameters by analysing input train images
 

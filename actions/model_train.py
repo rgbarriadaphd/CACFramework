@@ -79,8 +79,9 @@ class ModelTrain:
         Gathers model architecture
         :return:
         """
-        architecture = Architecture(self._architecture, seed=MODEL_SEED)
-        self._model = architecture.get()
+        self._architecture = Architecture(self._architecture, seed=MODEL_SEED)
+        self._model = self._architecture.get()
+        logging.info(f'Init model with weights: {self._architecture.weights_sum()}')
 
     def _get_normalization(self):
         """
@@ -176,8 +177,10 @@ class ModelTrain:
             train_data, test_data = self._fold_handler.generate_run_set(fold_id)
 
             # At each iteration the model should remain the same, so conditions are equal in each fold.
-            fold_model = copy(self._model)
+            fold_architecture = copy(self._architecture)
+            fold_model = fold_architecture.get()
             fold_model.to(device=self._device)
+            logging.info(f'Pre train step fold model weights: {self._architecture.weights_sum()}')
 
             # Get dataset normalization mean and std
             self._get_normalization()
@@ -196,6 +199,9 @@ class ModelTrain:
                                              train_loader=train_data_loader,
                                              )
             tf_fold_train = time.time() - t0_fold_train
+
+            self._architecture.update(fold_model)
+            logging.info(f'Post train step fold model weights: {self._architecture.weights_sum()}')
 
             # Test model. Test step over train model in current fold
             # <--------------------------------------------------------------------->

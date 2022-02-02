@@ -50,7 +50,7 @@ class CrossValidationMeasures:
         """
         :return: Mean value
         """
-        if self._percent:
+        if self._percent and self._measures[0] <= 1.0:
             mean = self._mean * 100.0
         else:
             mean = self._mean
@@ -63,7 +63,7 @@ class CrossValidationMeasures:
         """
         :return: Std Dev value
         """
-        if self._percent:
+        if self._percent and self._measures[0] <= 1.0:
             stddev = self._stddev * 100.0
         else:
             stddev = self._stddev

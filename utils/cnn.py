@@ -53,6 +53,25 @@ class Architecture:
         elif self._architecture == 'resnet18':
             self._init_resnet('resnet18')
 
+    def _compute_weights_sum(self):
+        """
+        Compute weights ssum
+        """
+        if self._architecture == 'vgg16':
+            self._compute_vgg('vgg16')
+        elif self._architecture == 'vgg19':
+            self._compute_vgg('vgg19')
+        elif self._architecture == 'resnet18':
+            self._compute_resnet('resnet18')
+
+    def _compute_vgg(self, version='vgg16'):
+        """
+        Compute model weights sum
+        :param version: (str) vgg version. vgg16 by default
+        """
+        # Base weights sum
+        self._weights_sum = self._model.classifier[6].weight.sum()
+
     def _init_vgg(self, version='vgg16'):
         """
         Init architecture
@@ -79,8 +98,29 @@ class Architecture:
         features.extend([linear])  # Add our layer with 2 outputs
         self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
 
+        # Base weights sum
+        self._weights_sum = self._model.classifier[6].weight.sum()
+
     def get(self):
+        """
+        Return model
+        """
         return self._model
+
+    def weights_sum(self):
+        """
+        Return last layer weights sum
+        """
+        return self._weights_sum
+
+    def update(self, model):
+        """
+        Update model
+        :param model: (torch.models) model
+        """
+        self._model = model
+        self._compute_weights_sum()
+
 
 
 def train_model(model, device, train_loader):

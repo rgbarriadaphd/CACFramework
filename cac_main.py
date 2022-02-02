@@ -10,6 +10,7 @@ import os.path
 import sys
 import logging
 import datetime
+import shutil
 
 from constants.path_constants import *
 from constants.train_constants import *
@@ -78,6 +79,7 @@ def display_help():
           "usage: python cac_main.py <options>\n" \
           "Options:\n" \
           "  [-help | -h]: Display help.\n" \
+          "  [-clear | -cl]: Clear logs and models.\n" \
           "  [-train | -tr]: train and test model.\n" \
           "  [-experiment | -exp] -id=<exp_id> -model=<model_folder>:  test specified model.\n"
     print(msg)
@@ -101,6 +103,23 @@ def cac_main(args):
     """
     if len(args) != 2 and len(args) != 4:
         display_help()
+        return
+
+    if len(args) == 2 and args[1] == '-clear' or args[1] == '-cl':
+        answer_valid = False
+        while not answer_valid:
+            value = input("Do you want to clear logs and models folders? (y/n):  ")
+            if value == 'y' or value == 'yes':
+                print("Deleting logs and model storage")
+                for f in os.listdir(MODELS_FOLDER):
+                    shutil.rmtree(os.path.join(MODELS_FOLDER, f))
+                for f in os.listdir(LOGS_FOLDER):
+                    shutil.rmtree(os.path.join(LOGS_FOLDER, f))
+                answer_valid = True
+            elif value == 'n' or value == 'no':
+                answer_valid = True
+            else:
+                print(f'Please, "{value}" is not a valid answer. Please, type "y" or "n" ')
         return
 
     date_time = get_execution_time()
