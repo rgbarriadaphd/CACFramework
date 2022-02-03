@@ -6,8 +6,11 @@
 
 Description: Functions to provide performance metrics
 """
+import logging
 import statistics
 import math
+
+from constants.train_constants import ND
 
 
 class CrossValidationMeasures:
@@ -25,6 +28,9 @@ class CrossValidationMeasures:
             If activated return string instead of float
         """
         assert (len(measures_list) > 0)
+        logging.debug(measures_list)
+        logging.debug(percent)
+        logging.debug(formatted)
         self._measures = measures_list
         self._confidence = confidence
         self._percent = percent
@@ -55,7 +61,7 @@ class CrossValidationMeasures:
         else:
             mean = self._mean
         if self._formatted:
-            return f'{mean:.2f}'
+            return f'{mean:.{ND}f}'
         else:
             return mean
 
@@ -68,7 +74,7 @@ class CrossValidationMeasures:
         else:
             stddev = self._stddev
         if self._formatted:
-            return f'{stddev:.2f}'
+            return f'{stddev:.{ND}f}'
         else:
             return stddev
 
@@ -81,7 +87,7 @@ class CrossValidationMeasures:
         else:
             interval = self._interval[0], self._interval[1]
         if self._formatted:
-            return f'({self._interval[0]:.2f}, {self._interval[1]:.2f})'
+            return f'({self._interval[0]:.{ND}f}, {self._interval[1]:.{ND}f})'
         else:
             return interval
 
@@ -178,7 +184,7 @@ class PerformanceMetrics:
         else:
             accuracy = self._accuracy
         if self._formatted:
-            return f'{accuracy:.2f}'
+            return f'{accuracy:.{ND}f}'
         else:
             return accuracy
 
@@ -191,7 +197,7 @@ class PerformanceMetrics:
         else:
             precision = self._precision
         if self._formatted:
-            return f'{precision:.2f}'
+            return f'{precision:.{ND}f}'
         else:
             return precision
 
@@ -204,7 +210,7 @@ class PerformanceMetrics:
         else:
             recall = self._recall
         if self._formatted:
-            return f'{recall:.2f}'
+            return f'{recall:.{ND}f}'
         else:
             return recall
 
@@ -217,7 +223,7 @@ class PerformanceMetrics:
         else:
             f1 = self._f1
         if self._formatted:
-            return f'{f1:.2f}'
+            return f'{f1:.{ND}f}'
         else:
             return f1
 

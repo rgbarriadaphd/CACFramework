@@ -29,3 +29,4 @@ CUSTOM_NORMALIZED = True  # Retrieve normalization parameters by analysing input
 SAVE_MODEL = True  # True if model has to be saved
 SAVE_LOSS_PLOT = True  # True if loss plot has to be saved
 MONO_FOLD = False  # Run only one Fold
+ND = 2  # Number of decimals at outputs

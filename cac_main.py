@@ -114,7 +114,7 @@ def cac_main(args):
                 for f in os.listdir(MODELS_FOLDER):
                     shutil.rmtree(os.path.join(MODELS_FOLDER, f))
                 for f in os.listdir(LOGS_FOLDER):
-                    shutil.rmtree(os.path.join(LOGS_FOLDER, f))
+                    os.remove(os.path.join(LOGS_FOLDER, f))
                 answer_valid = True
             elif value == 'n' or value == 'no':
                 answer_valid = True

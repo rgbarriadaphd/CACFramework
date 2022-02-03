@@ -170,6 +170,7 @@ class ModelTrain:
         t0 = time.time()
         folds_performance = []
         folds_acc = []
+        initweights = self._architecture.weights_sum()
         for fold_id in range(1, 6):
             logging.info(f'Processing fold: {fold_id}')
 
@@ -180,6 +181,7 @@ class ModelTrain:
             fold_architecture = copy(self._architecture)
             fold_model = fold_architecture.get()
             fold_model.to(device=self._device)
+            preweights = self._architecture.weights_sum()
             logging.info(f'Pre train step fold model weights: {self._architecture.weights_sum()}')
 
             # Get dataset normalization mean and std
@@ -200,8 +202,9 @@ class ModelTrain:
                                              )
             tf_fold_train = time.time() - t0_fold_train
 
-            self._architecture.update(fold_model)
-            logging.info(f'Post train step fold model weights: {self._architecture.weights_sum()}')
+            postweights = self._architecture.compute_weights_external(fold_model)
+            logging.info(f'Post train step fold model weights: {postweights}')
+
 
             # Test model. Test step over train model in current fold
             # <--------------------------------------------------------------------->
@@ -219,10 +222,10 @@ class ModelTrain:
                 f'fold_id_{fold_id}': fold_id,
                 f'n_train_{fold_id}': len(train_data_loader.dataset),
                 f'n_test_{fold_id}': len(test_data_loader.dataset),
-                f'mean_{fold_id}': self._normalization[0],
-                f'std_{fold_id}': self._normalization[1],
-                f'fold_train_time_{fold_id}': f'{tf_fold_train:.2f}',
-                f'fold_test_time_{fold_id}': f'{tf_fold_test:.2f}',
+                f'mean_{fold_id}': f'{self._normalization[0][0]:.{ND}f}, {self._normalization[0][1]:.{ND}f}, {self._normalization[0][2]:.{ND}f}',
+                f'std_{fold_id}': f'{self._normalization[1][0]:.{ND}f}, {self._normalization[1][1]:.{ND}f}, {self._normalization[1][2]:.{ND}f}',
+                f'fold_train_time_{fold_id}': f'{tf_fold_train:.{ND}f}',
+                f'fold_test_time_{fold_id}': f'{tf_fold_test:.{ND}f}',
             }
             model_performance.update(fold_data)
             folds_performance.append(model_performance)
@@ -244,7 +247,7 @@ class ModelTrain:
         cvm = CrossValidationMeasures(measures_list=folds_acc, percent=True, formatted=True)
         global_performance = {
             'execution_time': str(timedelta(seconds=time.time() - t0)),
-            'folds_accuracy': f'[{folds_acc[0]:.2f}, {folds_acc[1]:.2f}, {folds_acc[2]:.2f}, {folds_acc[3]:.2f}, {folds_acc[4]:.2f}]',
+            'folds_accuracy': f'[{folds_acc[0]:.{ND}f}, {folds_acc[1]:.{ND}f}, {folds_acc[2]:.{ND}f}, {folds_acc[3]:.{ND}f}, {folds_acc[4]:.{ND}f}]',
             'cross_v_mean': cvm.mean(),
             'cross_v_stddev': cvm.stddev(),
             'cross_v_interval': cvm.interval()

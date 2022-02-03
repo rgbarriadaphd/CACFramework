@@ -53,24 +53,19 @@ class Architecture:
         elif self._architecture == 'resnet18':
             self._init_resnet('resnet18')
 
-    def _compute_weights_sum(self):
+    def _compute_weights_sum(self, model):
         """
-        Compute weights ssum
+        Compute weights sum
+        :param model: (torch.models) model
         """
         if self._architecture == 'vgg16':
-            self._compute_vgg('vgg16')
+            return model.classifier[6].weight.sum()
         elif self._architecture == 'vgg19':
-            self._compute_vgg('vgg19')
+            # TBI: implement for vgg19
+            pass
         elif self._architecture == 'resnet18':
-            self._compute_resnet('resnet18')
-
-    def _compute_vgg(self, version='vgg16'):
-        """
-        Compute model weights sum
-        :param version: (str) vgg version. vgg16 by default
-        """
-        # Base weights sum
-        self._weights_sum = self._model.classifier[6].weight.sum()
+            pass
+            # TBI: implement for resnet18
 
     def _init_vgg(self, version='vgg16'):
         """
@@ -113,14 +108,12 @@ class Architecture:
         """
         return self._weights_sum
 
-    def update(self, model):
+    def compute_weights_external(self, model):
         """
-        Update model
+        Giving a external model, compute corresponding weights sum
         :param model: (torch.models) model
         """
-        self._model = model
-        self._compute_weights_sum()
-
+        return self._compute_weights_sum(model)
 
 
 def train_model(model, device, train_loader):
@@ -211,14 +204,12 @@ def evaluate_model(model, test_loader, device, fold_id):
     confusion_matrix = pm.confusion_matrix()
 
     return {
-        f'accuracy_{fold_id}': pm.accuracy(),
-        f'precision_{fold_id}': pm.precision(),
-        f'recall_{fold_id}': pm.recall(),
-        f'f1_{fold_id}': pm.f1(),
-        f'tn_{fold_id}': confusion_matrix[0],
-        f'fp_{fold_id}': confusion_matrix[1],
-        f'fn_{fold_id}': confusion_matrix[2],
-        f'tp_{fold_id}': confusion_matrix[3]
-    }, (100 * correct) / total
-
-
+               f'accuracy_{fold_id}': pm.accuracy(),
+               f'precision_{fold_id}': pm.precision(),
+               f'recall_{fold_id}': pm.recall(),
+               f'f1_{fold_id}': pm.f1(),
+               f'tn_{fold_id}': confusion_matrix[0],
+               f'fp_{fold_id}': confusion_matrix[1],
+               f'fn_{fold_id}': confusion_matrix[2],
+               f'tp_{fold_id}': confusion_matrix[3]
+           }, (100 * correct) / total
