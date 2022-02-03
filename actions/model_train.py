@@ -13,6 +13,7 @@ from copy import copy
 from datetime import datetime, timedelta
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 from string import Template
 
 from constants.path_constants import *
@@ -45,7 +46,7 @@ class ModelTrain:
         """
         Creates the folder where output data will be stored
         """
-        self._train_folder = os.path.join(MODELS_FOLDER, "run_" + self._date_time)
+        self._train_folder = os.path.join(MODELS_FOLDER, f'train_{ARCHITECTURE}_{self._date_time}')
         try:
             os.mkdir(self._train_folder)
         except OSError:
@@ -101,19 +102,18 @@ class ModelTrain:
         logging.info(f'Saving folder model to {folder_model_path}')
         torch.save(fold_model.state_dict(), folder_model_path)
 
-    def _save_plot_fold(self, losses, fold_id):
+    def _save_plot_fold(self, measures, fold_id, plot_type='loss'):
         """
         Plots fold loss evolution
-        :param losses: (list) list of losses
+        :param measures: (list) list of losses
         :param fold_id: (int) fold id
+        :param plot_type: (str) type of measure plot
         """
-
         fig, ax = plt.subplots()
-        model = 'vgg16'
 
-        tx = f'Model = {self._architecture}\nEpochs = {EPOCHS}\nBatch size = {BATCH_SIZE}\nLearning rate = {LEARNING_RATE}'
+        tx = f'Model = {ARCHITECTURE}\nEpochs = {EPOCHS}\nBatch size = {BATCH_SIZE}\nLearning rate = {LEARNING_RATE}'
 
-        ax.plot(list(range(len(losses))), losses)
+        ax.plot(list(range(1, len(measures) + 1)), measures)
 
         # these are matplotlib.patch.Patch properties
         props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
@@ -121,11 +121,12 @@ class ModelTrain:
         # place a text box in upper left in axes coords
         ax.text(0.72, 0.95, tx, transform=ax.transAxes, fontsize=8,
                 verticalalignment='top', bbox=props)
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
-        plt.ylabel('loss')
+        plt.ylabel(plot_type)
         plt.xlabel('epochs')
-        plt.title('Loss convergence')
-        plot_path = os.path.join(self._train_folder, f'loss_{fold_id}.png')
+        plt.title(f'{plot_type} evolution')
+        plot_path = os.path.join(self._train_folder, f'{plot_type}_{fold_id}.png')
         logging.info(f'Saving plot to {plot_path}')
         plt.savefig(plot_path)
     
@@ -196,10 +197,11 @@ class ModelTrain:
                                                         std=self._normalization[1])
             # Measure train time
             t0_fold_train = time.time()
-            fold_model, losses = train_model(model=fold_model,
-                                             device=self._device,
-                                             train_loader=train_data_loader,
-                                             )
+            fold_model, losses, accuracies = train_model(model=fold_model,
+                                                         device=self._device,
+                                                         train_loader=train_data_loader,
+                                                         normalization=self._normalization
+                                                         )
             tf_fold_train = time.time() - t0_fold_train
 
             postweights = self._architecture.compute_weights_external(fold_model)
@@ -222,8 +224,8 @@ class ModelTrain:
                 f'fold_id_{fold_id}': fold_id,
                 f'n_train_{fold_id}': len(train_data_loader.dataset),
                 f'n_test_{fold_id}': len(test_data_loader.dataset),
-                f'mean_{fold_id}': f'{self._normalization[0][0]:.{ND}f}, {self._normalization[0][1]:.{ND}f}, {self._normalization[0][2]:.{ND}f}',
-                f'std_{fold_id}': f'{self._normalization[1][0]:.{ND}f}, {self._normalization[1][1]:.{ND}f}, {self._normalization[1][2]:.{ND}f}',
+                f'mean_{fold_id}': f'[{self._normalization[0][0]:.{ND}f}, {self._normalization[0][1]:.{ND}f}, {self._normalization[0][2]:.{ND}f}]',
+                f'std_{fold_id}': f'[{self._normalization[1][0]:.{ND}f}, {self._normalization[1][1]:.{ND}f}, {self._normalization[1][2]:.{ND}f}]',
                 f'fold_train_time_{fold_id}': f'{tf_fold_train:.{ND}f}',
                 f'fold_test_time_{fold_id}': f'{tf_fold_test:.{ND}f}',
             }
@@ -232,7 +234,11 @@ class ModelTrain:
 
             # Generate Loss plot
             if SAVE_LOSS_PLOT:
-                self._save_plot_fold(losses, fold_id)
+                self._save_plot_fold(losses, fold_id, plot_type='loss')
+
+            # Generate Loss plot
+            if SAVE_ACCURACY_PLOT:
+                self._save_plot_fold(accuracies, fold_id, plot_type='accuracy')
 
             # Save fold model
             if SAVE_MODEL:

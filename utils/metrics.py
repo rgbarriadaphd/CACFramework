@@ -28,9 +28,6 @@ class CrossValidationMeasures:
             If activated return string instead of float
         """
         assert (len(measures_list) > 0)
-        logging.debug(measures_list)
-        logging.debug(percent)
-        logging.debug(formatted)
         self._measures = measures_list
         self._confidence = confidence
         self._percent = percent

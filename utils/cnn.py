@@ -17,7 +17,9 @@ import torch.nn as nn
 from torch import optim
 
 from constants.train_constants import *
+from constants.path_constants import *
 from utils.metrics import PerformanceMetrics
+from utils.load_dataset import load_and_transform_data
 
 
 class Architecture:
@@ -116,12 +118,13 @@ class Architecture:
         return self._compute_weights_sum(model)
 
 
-def train_model(model, device, train_loader):
+def train_model(model, device, train_loader, normalization=None):
     """
     Trains the model with input parametrization
     :param model: (torchvision.models) Pytorch model
     :param device: (torch.cuda.device) Computing device
     :param train_loader: (torchvision.datasets) Train dataloader containing dataset images
+    :param normalization: Normalization to test train dataset
     :return: train model
     """
     n_train = len(train_loader.dataset)
@@ -140,6 +143,7 @@ def train_model(model, device, train_loader):
 
     # TODO: Parametrize loss convergence function
     losses = []
+    accuracies = []
     for epoch in range(EPOCHS):
         model.train(True)
         with tqdm(total=n_train, desc=f'Epoch {epoch + 1}/{EPOCHS}', unit='img') as pbar:
@@ -157,7 +161,16 @@ def train_model(model, device, train_loader):
                 pbar.set_postfix(**{'loss (batch) ': loss.item()})
                 pbar.update(sample.shape[0])
         losses.append(loss.item())
-    return model, losses
+
+        if SAVE_ACCURACY_PLOT:
+            logging.info('Evaluate train dataset accuracy')
+            test_train_loader = load_and_transform_data(os.path.join(DYNAMIC_RUN_FOLDER, TRAIN),
+                                                        mean=normalization[0],
+                                                        std=normalization[1])
+            _, accuracy = evaluate_model(model, test_train_loader, device, None)
+            accuracies.append(accuracy)
+
+    return model, losses, accuracies
 
 
 def evaluate_model(model, test_loader, device, fold_id):

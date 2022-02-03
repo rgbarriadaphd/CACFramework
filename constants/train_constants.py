@@ -10,7 +10,7 @@ Description: constants definition related to the training stage
 # Train hyperparameters
 # =======================
 
-EPOCHS = 1
+EPOCHS = 5
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0001
 WEIGHT_DECAY = 4e-2
@@ -28,5 +28,6 @@ CUSTOM_NORMALIZED = True  # Retrieve normalization parameters by analysing input
 # =======================
 SAVE_MODEL = True  # True if model has to be saved
 SAVE_LOSS_PLOT = True  # True if loss plot has to be saved
+SAVE_ACCURACY_PLOT = True  # True if accuracy plot has to be saved
 MONO_FOLD = False  # Run only one Fold
 ND = 2  # Number of decimals at outputs
