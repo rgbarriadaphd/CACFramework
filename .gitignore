@@ -16,3 +16,5 @@ logs/
 utils/__pycache__/
 
 models/
+
+.idea/

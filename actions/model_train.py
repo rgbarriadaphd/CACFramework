@@ -129,7 +129,30 @@ class ModelTrain:
         plot_path = os.path.join(self._train_folder, f'{plot_type}_{fold_id}.png')
         logging.info(f'Saving plot to {plot_path}')
         plt.savefig(plot_path)
-    
+
+    def _save_fold_accuracies(self, train, test, fold_id):
+        """
+        Plot together train and test accuracies by fold
+        :param train: (list) list of train accuracies
+        :param test: (list) list of test accuracies
+        :param fold_id: (int) fold id
+        """
+        assert len(train) == len(test)
+        fig, ax1 = plt.subplots()
+        ax1.set_xlabel('epochs')
+        ax1.set_ylabel('accuracy')
+        plt.title(f'Model accuracy')
+        ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+        x_epochs = list(range(1, len(test) + 1))
+        ax1.plot(x_epochs, test, label='test')
+        ax1.plot(x_epochs, train, label='train')
+        ax1.legend()
+
+        plot_path = os.path.join(self._train_folder, f'accuracy_{fold_id}.png')
+        logging.info(f'Saving accuracy plot to {plot_path}')
+        plt.savefig(plot_path)
+
     def _save_train_summary(self, folds_performance, global_performance):
 
         # Global Configuration
@@ -204,8 +227,8 @@ class ModelTrain:
                                                          )
             tf_fold_train = time.time() - t0_fold_train
 
-            postweights = self._architecture.compute_weights_external(fold_model)
-            logging.info(f'Post train step fold model weights: {postweights}')
+            post_weights = self._architecture.compute_weights_external(fold_model)
+            logging.info(f'Post train step fold model weights: {post_weights}')
 
 
             # Test model. Test step over train model in current fold
@@ -238,7 +261,7 @@ class ModelTrain:
 
             # Generate Loss plot
             if SAVE_ACCURACY_PLOT:
-                self._save_plot_fold(accuracies, fold_id, plot_type='accuracy')
+                self._save_fold_accuracies(accuracies[0], accuracies[1], fold_id)
 
             # Save fold model
             if SAVE_MODEL:

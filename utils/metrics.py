@@ -152,19 +152,28 @@ class PerformanceMetrics:
         """
         Computes the precision of a model
         """
-        self._precision = self._tp / (self._tp + self._fp)
+        try:
+            self._precision = self._tp / (self._tp + self._fp)
+        except ZeroDivisionError:
+            self._precision = 0.0
 
     def _compute_recall(self):
         """
         Computes the recall of a model
         """
-        self._recall = self._tp / (self._tp + self._fn)
+        try:
+            self._recall = self._tp / (self._tp + self._fn)
+        except ZeroDivisionError:
+            self._recall = 0.0
 
     def _compute_f1(self):
         """
         Computes the F1 measure of a model
         """
-        self._f1 = 2 * (self._precision * self._recall / (self._precision + self._recall))
+        try:
+            self._f1 = 2 * (self._precision * self._recall / (self._precision + self._recall))
+        except ZeroDivisionError:
+            self._f1 = 0.0
 
     def confusion_matrix(self):
         """
