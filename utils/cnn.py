@@ -70,6 +70,12 @@ class Architecture:
             self._init_mobilenet()
         elif self._architecture.startswith('mnasnet'):
             self._init_mnasnet()
+        elif self._architecture.startswith('rexnet'):
+            self._init_rexnet()
+        elif self._architecture.startswith('wideresnet'):
+            self._init_wideresnet()
+        elif self._architecture.startswith('regnet'):
+            self._init_regnet()
 
     def _compute_weights_sum(self, model):
         """
@@ -80,6 +86,263 @@ class Architecture:
             return model.classifier[6].weight.sum()
         elif self._architecture.startswith('resnet'):
             return self._model.fc.weight.sum()
+        elif self._architecture.startswith('efficientnet'):
+            return model.classifier[1].weight.sum()
+        elif self._architecture == 'inception_v3':
+            return self._model.fc.weight.sum()
+        elif self._architecture == 'alexnet':
+            return model.classifier[6].weight.sum()
+        elif self._architecture == 'squeezenet1_1':
+            return model.classifier[3].weight.sum()
+        elif self._architecture.startswith('densenet'):
+            return model.classifier.weight.sum()
+        elif self._architecture == 'googlenet':
+            return model.fc.weight.sum()
+        elif self._architecture.startswith('shufflenet'):
+            return model.fc.weight.sum()
+        elif self._architecture.startswith('mobilenet'):
+            return model.classifier[1].weight.sum()
+        elif self._architecture.startswith('mnasnet'):
+            return model.classifier[1].weight.sum()
+        elif self._architecture.startswith('rexnet'):
+            return model.fc.weight.sum()
+        elif self._architecture.startswith('wideresnet'):
+            return model.fc.weight.sum()
+        elif self._architecture.startswith('regnet'):
+            return model.fc.weight.sum()
+
+    def _init_wideresnet(self):
+        """
+        Init RegNet architecture
+        """
+        # Load corresponding RegNet model
+        if self._architecture == 'regnet_y_400mf':
+            self._model = models.regnet_y_400mf(pretrained=True)
+        elif self._architecture == 'regnet_y_800mf':
+            self._model = models.regnet_y_800mf(pretrained=True)
+        elif self._architecture == 'regnet_y_1_6gf':
+            self._model = models.regnet_y_1_6gf(pretrained=True)
+        elif self._architecture == 'regnet_y_3_2gf':
+            self._model = models.regnet_y_3_2gf(pretrained=True)
+        elif self._architecture == 'regnet_y_8gf':
+            self._model = models.regnet_y_8gf(pretrained=True)
+        elif self._architecture == 'regnet_y_16gf':
+            self._model = models.regnet_y_16gf(pretrained=True)
+        elif self._architecture == 'regnet_y_32gf':
+            self._model = models.regnet_y_32gf(pretrained=True)
+        elif self._architecture == 'regnet_x_400mf':
+            self._model = models.regnet_x_400mf(pretrained=True)
+        elif self._architecture == 'regnet_x_800mf':
+            self._model = models.regnet_x_800mf(pretrained=True)
+        elif self._architecture == 'regnet_x_1_6gf':
+            self._model = models.regnet_x_1_6gf(pretrained=True)
+        elif self._architecture == 'regnet_x_3_2gf':
+            self._model = models.regnet_x_3_2gf(pretrained=True)
+        elif self._architecture == 'regnet_x_8gf':
+            self._model = models.regnet_x_8gf(pretrained=True)
+        elif self._architecture == 'regnet_x_16gf':
+            self._model = models.regnet_x_16gf(pretrained=True)
+        elif self._architecture == 'regnet_x_32gf':
+            self._model = models.regnet_x_32gf(pretrained=True)
+
+        # Freeze trained weights
+        for param in self._model.parameters():
+            param.requires_grad = False
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.fc.in_features
+        linear = nn.Linear(num_features, N_CLASSES)
+        self._model.fc = linear  # Replace the model classifier
+
+        # Base weights sum
+        self._weights_sum = self._model.fc.weight.sum()
+
+    def _init_wideresnet(self):
+        """
+        Init Wide Resnet architecture
+        """
+        # Load corresponding ReNext model
+        if self._architecture == 'wide_resnet50_2':
+            self._model = models.wide_resnet50_2(pretrained=self._pretrained)
+        elif self._architecture == 'wide_resnet101_2':
+            self._model = models.wide_resnet101_2(pretrained=self._pretrained)
+
+        # Freeze trained weights
+        for param in self._model.parameters():
+            param.requires_grad = False
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.fc.in_features
+        linear = nn.Linear(num_features, N_CLASSES)
+        self._model.fc = linear  # Replace the model classifier
+
+        # Base weights sum
+        self._weights_sum = self._model.fc.weight.sum()
+
+    def _init_rexnet(self):
+        """
+        Init ReNext architecture
+        """
+        # Load corresponding ReNext model
+        if self._architecture == 'resnext50_32x4d':
+            self._model = models.resnext50_32x4d(pretrained=self._pretrained)
+        elif self._architecture == 'shufflenet_v2_x1_0':
+            self._model = models.resnext101_32x8d(pretrained=self._pretrained)
+
+        # Freeze trained weights
+        for param in self._model.parameters():
+            param.requires_grad = False
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.fc.in_features
+        linear = nn.Linear(num_features, N_CLASSES)
+        self._model.fc = linear  # Replace the model classifier
+
+        # Base weights sum
+        self._weights_sum = self._model.fc.weight.sum()
+
+    def _init_mnasnet(self):
+        """
+        Init Mobilenet architecture
+        """
+        # Load corresponding mobilenet model
+        if self._architecture == 'mnasnet0_5':
+            self._model = models.mnasnet0_5(pretrained=self._pretrained)
+        elif self._architecture == 'mnasnet1_0':
+            self._model = models.mnasnet1_0(pretrained=self._pretrained)
+
+        # Freeze trained weights
+        for param in self._model.features.parameters():
+            param.requires_grad = False
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.classifier[1].in_features
+        features = list(self._model.classifier.children())[:-1]  # Remove last layer
+        linear = nn.Linear(num_features, N_CLASSES)
+
+        features.extend([linear])  # Add our layer with 2 outputs
+        self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
+
+        # Base weights sum
+        self._weights_sum = self._model.classifier[1].weight.sum()
+
+    def _init_mobilenet(self):
+        """
+        Init Mobilenet architecture
+        """
+        # Load corresponding mobilenet model
+        if self._architecture == 'mobilenet_v2':
+            self._model = models.mobilenet_v2(pretrained=self._pretrained)
+        elif self._architecture == 'mobilenet_v3_small':
+            self._model = models.mobilenet_v3_small(pretrained=self._pretrained)
+        elif self._architecture == 'mobilenet_v3_large':
+            self._model = models.mobilenet_v3_large(pretrained=self._pretrained)
+
+        # Freeze trained weights
+        for param in self._model.features.parameters():
+            param.requires_grad = False
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.classifier[1].in_features
+        features = list(self._model.classifier.children())[:-1]  # Remove last layer
+        linear = nn.Linear(num_features, N_CLASSES)
+
+        features.extend([linear])  # Add our layer with 2 outputs
+        self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
+
+        # Base weights sum
+        self._weights_sum = self._model.classifier[1].weight.sum()
+
+    def _init_shufflenet(self):
+        """
+        Init Shufflenet architecture
+        """
+        # Load corresponding Shufflenet model
+        if self._architecture == 'shufflenet_v2_x0_5':
+            self._model = models.shufflenet_v2_x0_5(pretrained=self._pretrained)
+        elif self._architecture == 'shufflenet_v2_x1_0':
+            self._model = models.shufflenet_v2_x1_0(pretrained=self._pretrained)
+
+        # Freeze trained weights
+        for param in self._model.parameters():
+            param.requires_grad = False
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.fc.in_features
+        linear = nn.Linear(num_features, N_CLASSES)
+        self._model.fc = linear  # Replace the model classifier
+
+        # Base weights sum
+        self._weights_sum = self._model.fc.weight.sum()
+
+    def _init_googlenet(self):
+        """
+        Init Googlenet architecture
+        """
+        # Load corresponding googlenet model
+        if self._architecture == 'googlenet':
+            self._model = models.googlenet(pretrained=self._pretrained)
+
+        # Freeze trained weights
+        for param in self._model.parameters():
+            param.requires_grad = False
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.fc.in_features
+        linear = nn.Linear(num_features, N_CLASSES)
+        self._model.fc = linear  # Replace the model classifier
+
+        # Base weights sum
+        self._weights_sum = self._model.fc.weight.sum()
+
+    def _init_densenet(self):
+        """
+        Init DenseNet architecture
+        """
+        # Load corresponding vgg model
+        if self._architecture == 'densenet121':
+            self._model = models.densenet121(pretrained=self._pretrained)
+        elif self._architecture == 'densenet161':
+            self._model = models.densenet161(pretrained=self._pretrained)
+        elif self._architecture == 'densenet169':
+            self._model = models.densenet169(pretrained=self._pretrained)
+        elif self._architecture == 'densenet201':
+            self._model = models.densenet201(pretrained=self._pretrained)
+
+        # Freeze trained weights
+        for param in self._model.features.parameters():
+            param.requires_grad = False
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.classifier.in_features
+        self._model.classifier = nn.Linear(num_features, N_CLASSES)
+
+        # Base weights sum
+        self._weights_sum = self._model.classifier.weight.sum()
+
+    def _init_squeezenet(self):
+        """
+        Init Squeezenet 1.1 architecture
+        """
+        # Load corresponding vgg model
+        if self._architecture == 'squeezenet1_1':
+            self._model = models.squeezenet1_1(pretrained=self._pretrained)
+        # TBI: rest of squeeze architectures. worth?
+
+        # Freeze trained weights
+        for param in self._model.features.parameters():
+            param.requires_grad = False
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.classifier[3].in_features
+        features = list(self._model.classifier.children())[:-1]  # Remove last layer
+        linear = nn.Linear(num_features, N_CLASSES)
+
+        features.extend([linear])  # Add our layer with 2 outputs
+        self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
+
+        # Base weights sum
+        self._weights_sum = self._model.classifier[3].weight.sum()
 
     def _init_efficientnet(self):
         """
@@ -109,7 +372,7 @@ class Architecture:
             param.requires_grad = False
 
         # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.classifier[6].in_features
+        num_features = self._model.classifier[1].in_features
         features = list(self._model.classifier.children())[:-1]  # Remove last layer
         linear = nn.Linear(num_features, N_CLASSES)
 
@@ -117,7 +380,7 @@ class Architecture:
         self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
 
         # Base weights sum
-        self._weights_sum = self._model.classifier[6].weight.sum()
+        self._weights_sum = self._model.classifier[1].weight.sum()
 
     def _init_inception_v3(self):
         """
@@ -126,6 +389,26 @@ class Architecture:
         # Load corresponding vgg model
         if self._architecture == 'inception_v3':
             self._model = models.inception_v3(pretrained=self._pretrained)
+
+        # FIXME
+        # Freeze trained weights
+        for param in self._model.parameters():
+            param.requires_grad = False
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.fc.in_features
+        self._model.fc = nn.Linear(num_features, N_CLASSES)
+
+        # Base weights sum
+        self._weights_sum = self._model.fc.weight.sum()
+
+    def _init_alexnet(self):
+        """
+        Init Alexnet architecture
+        """
+        # Load corresponding vgg model
+        if self._architecture == 'alexnet':
+            self._model = models.alexnet(pretrained=self._pretrained)
 
         # FIXME
         # Freeze trained weights
@@ -278,8 +561,8 @@ def train_model(model, device, train_loader, normalization=None):
 
             for data_element in [TRAIN, TEST]:
                 data_loader = load_and_transform_data(os.path.join(DYNAMIC_RUN_FOLDER, data_element),
-                                                            mean=normalization[0],
-                                                            std=normalization[1])
+                                                      mean=normalization[0],
+                                                      std=normalization[1])
                 _, accuracy = evaluate_model(model, data_loader, device, None)
                 if data_element == TRAIN:
                     train_accuracies.append(accuracy)
