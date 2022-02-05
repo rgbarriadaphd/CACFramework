@@ -70,10 +70,10 @@ class Architecture:
             self._init_mobilenet()
         elif self._architecture.startswith('mnasnet'):
             self._init_mnasnet()
-        elif self._architecture.startswith('rexnet'):
-            self._init_rexnet()
-        elif self._architecture.startswith('wideresnet'):
-            self._init_wideresnet()
+        elif self._architecture.startswith('resnext'):
+            self._init_resnext()
+        elif self._architecture.startswith('wide_resnet'):
+            self._init_wide_resnet()
         elif self._architecture.startswith('regnet'):
             self._init_regnet()
 
@@ -101,17 +101,17 @@ class Architecture:
         elif self._architecture.startswith('shufflenet'):
             return model.fc.weight.sum()
         elif self._architecture.startswith('mobilenet'):
-            return model.classifier[1].weight.sum()
+            return model.classifier[self._index].weight.sum()
         elif self._architecture.startswith('mnasnet'):
             return model.classifier[1].weight.sum()
-        elif self._architecture.startswith('rexnet'):
+        elif self._architecture.startswith('resnext'):
             return model.fc.weight.sum()
         elif self._architecture.startswith('wideresnet'):
             return model.fc.weight.sum()
         elif self._architecture.startswith('regnet'):
             return model.fc.weight.sum()
 
-    def _init_wideresnet(self):
+    def _init_regnet(self):
         """
         Init RegNet architecture
         """
@@ -157,7 +157,7 @@ class Architecture:
         # Base weights sum
         self._weights_sum = self._model.fc.weight.sum()
 
-    def _init_wideresnet(self):
+    def _init_wide_resnet(self):
         """
         Init Wide Resnet architecture
         """
@@ -179,11 +179,11 @@ class Architecture:
         # Base weights sum
         self._weights_sum = self._model.fc.weight.sum()
 
-    def _init_rexnet(self):
+    def _init_resnext(self):
         """
-        Init ReNext architecture
+        Init ResNext architecture
         """
-        # Load corresponding ReNext model
+        # Load corresponding ResNext model
         if self._architecture == 'resnext50_32x4d':
             self._model = models.resnext50_32x4d(pretrained=self._pretrained)
         elif self._architecture == 'shufflenet_v2_x1_0':
@@ -212,7 +212,7 @@ class Architecture:
             self._model = models.mnasnet1_0(pretrained=self._pretrained)
 
         # Freeze trained weights
-        for param in self._model.features.parameters():
+        for param in self._model.parameters():
             param.requires_grad = False
 
         # Adapt architecture. Newly created modules have require_grad=True by default
@@ -233,17 +233,20 @@ class Architecture:
         # Load corresponding mobilenet model
         if self._architecture == 'mobilenet_v2':
             self._model = models.mobilenet_v2(pretrained=self._pretrained)
+            self._index = 1
         elif self._architecture == 'mobilenet_v3_small':
             self._model = models.mobilenet_v3_small(pretrained=self._pretrained)
+            self._index = 3
         elif self._architecture == 'mobilenet_v3_large':
             self._model = models.mobilenet_v3_large(pretrained=self._pretrained)
+            self._index = 3
 
         # Freeze trained weights
         for param in self._model.features.parameters():
             param.requires_grad = False
 
         # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.classifier[1].in_features
+        num_features = self._model.classifier[self._].in_features
         features = list(self._model.classifier.children())[:-1]  # Remove last layer
         linear = nn.Linear(num_features, N_CLASSES)
 
@@ -251,7 +254,7 @@ class Architecture:
         self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
 
         # Base weights sum
-        self._weights_sum = self._model.classifier[1].weight.sum()
+        self._weights_sum = self._model.classifier[self._].weight.sum()
 
     def _init_shufflenet(self):
         """

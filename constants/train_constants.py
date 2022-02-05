@@ -6,11 +6,11 @@
 
 Description: constants definition related to the training stage
 """
-LOG_LEVEL = 'debug'
+LOG_LEVEL = 'info'
 # Train hyperparameters
 # =======================
 
-EPOCHS = 60
+EPOCHS = 100
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0001
 WEIGHT_DECAY = 4e-2
@@ -18,7 +18,8 @@ CRITERION = 'CrossEntropyLoss'
 OPTIMIZER = 'SDG'
 # Architecture parameters
 # =======================
-ARCHITECTURE = 'alexnet'  # model architecture. Supported -->
+ARCHITECTURE = "resnet152"
+# model architecture supported:
 # ['regnet_y_400mf','regnet_y_800mf','regnet_y_1_6gf','regnet_y_3_2gf','regnet_y_8gf','regnet_y_16gf','regnet_y_32gf',
 # 'regnet_x_400mf','regnet_x_800mf','regnet_x_1_6gf','regnet_x_3_2gf','regnet_x_8gf','regnet_x_16gf','regnet_x_32gf',
 # 'wide_resnet50_2','wide_resnet101_2','resnext50_32x4d','shufflenet_v2_x1_0','mnasnet0_5','mnasnet1_0','mobilenet_v2',

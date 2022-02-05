@@ -97,7 +97,7 @@ def init_log(date_time, action):
     elif LOG_LEVEL == 'info':
         log_level = logging.INFO
 
-    logging.basicConfig(filename=os.path.join(LOGS_FOLDER, f'{action}_{date_time}.log'), level=log_level,
+    logging.basicConfig(filename=os.path.join(LOGS_FOLDER, f'{action}_{ARCHITECTURE}_{date_time}.log'), level=log_level,
                         format='[%(levelname)s] : %(message)s')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 

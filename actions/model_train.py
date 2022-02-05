@@ -170,7 +170,7 @@ class ModelTrain:
             'criterion': CRITERION,
             'optimizer': OPTIMIZER,
         }
-        
+
         for fold in folds_performance:
             summary_template_values.update(fold)
         # Append fold results
@@ -205,7 +205,6 @@ class ModelTrain:
             fold_architecture = copy(self._architecture)
             fold_model = fold_architecture.get()
             fold_model.to(device=self._device)
-            preweights = self._architecture.weights_sum()
             logging.info(f'Pre train step fold model weights: {self._architecture.weights_sum()}')
 
             # Get dataset normalization mean and std
@@ -229,7 +228,6 @@ class ModelTrain:
 
             post_weights = self._architecture.compute_weights_external(fold_model)
             logging.info(f'Post train step fold model weights: {post_weights}')
-
 
             # Test model. Test step over train model in current fold
             # <--------------------------------------------------------------------->
@@ -282,4 +280,3 @@ class ModelTrain:
             'cross_v_interval': cvm.interval()
         }
         self._save_train_summary(folds_performance, global_performance)
-
