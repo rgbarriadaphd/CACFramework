@@ -14,6 +14,7 @@ import torch
 from torchvision import datasets, transforms
 
 from constants.path_constants import DYNAMIC_RUN_FOLDER, TRAIN
+from constants.train_constants import ARCHITECTURE
 
 
 def get_custom_normalization():
@@ -84,9 +85,12 @@ def load_and_transform_data(dataset, batch_size=1, data_augmentation=False, mean
     else:
         logging.info(f'Applying custom normalization: mean={mean}, std={std}')
 
+    # TODO: architecture dependant parametrization!!
+    im_size = 224 if ARCHITECTURE != 'inception_v3' else 299
+
     if data_augmentation:
         data_transforms = transforms.Compose([
-            transforms.Resize((224, 224)), # FIXME: architecture dependant parametrization
+            transforms.Resize((im_size, im_size)), # FIXME: architecture dependant parametrization
             transforms.RandomRotation(20),
             transforms.RandomRotation(110),
             transforms.RandomHorizontalFlip(),
@@ -96,7 +100,7 @@ def load_and_transform_data(dataset, batch_size=1, data_augmentation=False, mean
         ])
     else:
         data_transforms = transforms.Compose([
-            transforms.Resize((224, 224)), # FIXME: architecture dependant parametrization
+            transforms.Resize((im_size, im_size)), # FIXME: architecture dependant parametrization
             transforms.ToTensor(),
             transforms.Normalize(mean=mean, std=std),
         ])

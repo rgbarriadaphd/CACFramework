@@ -4,21 +4,46 @@
 # Project: CACFramework
 # File: run_all.py
 
-Description: "Enter feature description here"
+Description: Script to train all available architectures over the train dataset
 """
 import os
+import sys
 
-ARCHITECTURES = ['wide_resnet50_2',
-                 'wide_resnet101_2', 'resnext50_32x4d', 'shufflenet_v2_x1_0', 'mnasnet0_5', 'mnasnet1_0',
-                 'mobilenet_v2', 'mobilenet_v3_small', 'mobilenet_v3_large', 'shufflenet_v2_x0_5', 'shufflenet_v2_x1_0',
-                 'googlenet', 'densenet121', 'densenet161', 'densenet169', 'densenet201', 'squeezenet1_1',
-                 'efficientnet_b0', 'efficientnet_b1', 'efficientnet_b2', 'efficientnet_b3', 'efficientnet_b4',
-                 'efficientnet_b5', 'efficientnet_b6', 'efficientnet_b7', 'inception_v3', 'alexnet', 'vgg16', 'vgg19',
-                 'vgg11', 'vgg13', 'vgg16_bn', 'vgg19_bn', 'vgg11_bn', 'vgg13_bn', 'resnet18', 'resnet34', 'resnet50',
+ARCHITECTURES = ['regnet_y_400mf', 'regnet_y_800mf', 'regnet_y_1_6gf', 'regnet_y_3_2gf', 'regnet_y_8gf',
+                 'regnet_y_16gf', 'regnet_y_32gf',
+                 'regnet_x_400mf', 'regnet_x_800mf', 'regnet_x_1_6gf', 'regnet_x_3_2gf', 'regnet_x_8gf',
+                 'regnet_x_16gf', 'regnet_x_32gf',
+                 'wide_resnet50_2', 'wide_resnet101_2', 'resnext50_32x4d', 'shufflenet_v2_x1_0', 'mnasnet0_5',
+                 'mnasnet1_0', 'mobilenet_v2',
+                 'mobilenet_v3_small', 'mobilenet_v3_large', 'shufflenet_v2_x0_5', 'shufflenet_v2_x1_0', 'googlenet',
+                 'densenet121',
+                 'densenet161', 'densenet169', 'densenet201', 'squeezenet1_1', 'efficientnet_b0', 'efficientnet_b1',
+                 'efficientnet_b2',
+                 'efficientnet_b3', 'efficientnet_b4', 'efficientnet_b5', 'efficientnet_b6', 'efficientnet_b7',
+                 'inception_v3', 'alexnet',
+                 'vgg16', 'vgg19', 'vgg11', 'vgg13', 'vgg16_bn', 'vgg19_bn', 'vgg11_bn', 'vgg13_bn', 'resnet18',
+                 'resnet34', 'resnet50',
                  'resnet101', 'resnet152']
 
 
+# ARCHITECTURES = ['regnet_y_400mf', 'regnet_y_800mf', 'regnet_y_1_6gf', 'regnet_y_3_2gf', 'regnet_y_8gf',
+#                  'regnet_y_16gf', 'regnet_y_32gf',
+#                  'regnet_x_400mf', 'regnet_x_800mf', 'regnet_x_1_6gf', 'regnet_x_3_2gf', 'regnet_x_8gf',
+#                  'regnet_x_16gf', 'regnet_x_32gf',
+#                  'wide_resnet50_2', 'wide_resnet101_2', 'resnext50_32x4d', 'shufflenet_v2_x1_0', 'mnasnet0_5',
+#                  'mnasnet1_0', 'mobilenet_v2',
+#                  'mobilenet_v3_small', 'mobilenet_v3_large', 'shufflenet_v2_x0_5', 'shufflenet_v2_x1_0', 'googlenet',
+#                  'densenet121',
+#                  'densenet161', 'densenet169', 'densenet201', 'squeezenet1_1', 'efficientnet_b0', 'efficientnet_b1',
+#                  'efficientnet_b2',
+#                  'efficientnet_b3', 'efficientnet_b4', 'efficientnet_b5', 'efficientnet_b6', 'efficientnet_b7']
+
+
 def modify_input_architecture(model):
+    """
+    Change the architecture definition of the train_constants.py file before run
+    :param model: (str) Current architecture
+    """
     constants_file = 'constants/train_constants.py'
     new_lines = []
     with open(constants_file, 'r') as f_in:
@@ -32,6 +57,10 @@ def modify_input_architecture(model):
 
 
 def get_model_parameters(model):
+    """
+    Retrieve the performance parameters from the summary of a specific model
+    :param model: (str) Current architecture
+    """
     folds_acc, mean, stddev, interval = None, None, None, None
     for folder in os.listdir('models'):
         if f'train_{model}' in folder:
@@ -51,7 +80,11 @@ def get_model_parameters(model):
     return folds_acc, mean, stddev, interval
 
 
-def write_ouput(model_parameters):
+def write_latex_table(model_parameters):
+    """
+    Write a latex table format with all models performance
+    :param model_parameters: (dict) Contains model performance by mdoel
+    """
     with open('templates/models.latex', 'w') as f_out:
         f_out.write('\\begin{table}[H]\n')
         f_out.write('\caption{Python architecture main models performance.}\n')
@@ -75,15 +108,15 @@ def write_ouput(model_parameters):
         f_out.write('\end{table}\n')
 
 
-def main():
-
+def run_all(args):
     models_parameters = dict.fromkeys(ARCHITECTURES)
     for model in ARCHITECTURES:
-        modify_input_architecture(model)
-        os.system("python cac_main.py -tr")
+        if len(args) == 1:
+            modify_input_architecture(model)
+            os.system("python cac_main.py -tr")
         models_parameters[model] = get_model_parameters(model)
-    write_ouput(models_parameters)
+    write_latex_table(models_parameters)
 
 
 if __name__ == '__main__':
-    main()
+    run_all(sys.argv)

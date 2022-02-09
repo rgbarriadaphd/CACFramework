@@ -10,7 +10,7 @@ LOG_LEVEL = 'info'
 # Train hyperparameters
 # =======================
 
-EPOCHS = 100
+EPOCHS = 60
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0001
 WEIGHT_DECAY = 4e-2
@@ -18,7 +18,7 @@ CRITERION = 'CrossEntropyLoss'
 OPTIMIZER = 'SDG'
 # Architecture parameters
 # =======================
-ARCHITECTURE = "resnet152"
+ARCHITECTURE = "inception_v3"
 # model architecture supported:
 # ['regnet_y_400mf','regnet_y_800mf','regnet_y_1_6gf','regnet_y_3_2gf','regnet_y_8gf','regnet_y_16gf','regnet_y_32gf',
 # 'regnet_x_400mf','regnet_x_800mf','regnet_x_1_6gf','regnet_x_3_2gf','regnet_x_8gf','regnet_x_16gf','regnet_x_32gf',
@@ -36,7 +36,7 @@ CUSTOM_NORMALIZED = True  # Retrieve normalization parameters by analysing input
 # Output parameters
 # =======================
 SAVE_MODEL = False  # True if model has to be saved
-SAVE_LOSS_PLOT = True  # True if loss plot has to be saved
-SAVE_ACCURACY_PLOT = True  # True if accuracy plot has to be saved
+SAVE_LOSS_PLOT = False  # True if loss plot has to be saved
+SAVE_ACCURACY_PLOT = False  # True if accuracy plot has to be saved
 MONO_FOLD = False  # Run only one Fold
 ND = 2  # Number of decimals at outputs

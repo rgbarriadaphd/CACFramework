@@ -93,7 +93,7 @@ class Architecture:
         elif self._architecture == 'alexnet':
             return model.classifier[6].weight.sum()
         elif self._architecture == 'squeezenet1_1':
-            return model.classifier[3].weight.sum()
+            return model.classifier[1].weight.sum()
         elif self._architecture.startswith('densenet'):
             return model.classifier.weight.sum()
         elif self._architecture == 'googlenet':
@@ -246,7 +246,7 @@ class Architecture:
             param.requires_grad = False
 
         # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.classifier[self._].in_features
+        num_features = self._model.classifier[self._index].in_features
         features = list(self._model.classifier.children())[:-1]  # Remove last layer
         linear = nn.Linear(num_features, N_CLASSES)
 
@@ -254,7 +254,7 @@ class Architecture:
         self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
 
         # Base weights sum
-        self._weights_sum = self._model.classifier[self._].weight.sum()
+        self._weights_sum = self._model.classifier[self._index].weight.sum()
 
     def _init_shufflenet(self):
         """
@@ -336,16 +336,12 @@ class Architecture:
         for param in self._model.features.parameters():
             param.requires_grad = False
 
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.classifier[3].in_features
-        features = list(self._model.classifier.children())[:-1]  # Remove last layer
-        linear = nn.Linear(num_features, N_CLASSES)
 
-        features.extend([linear])  # Add our layer with 2 outputs
-        self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        self._model.classifier[1] = nn.Conv2d(512, N_CLASSES, kernel_size=(1, 1), stride=(1, 1))
 
         # Base weights sum
-        self._weights_sum = self._model.classifier[3].weight.sum()
+        self._weights_sum = self._model.classifier[1].weight.sum()
 
     def _init_efficientnet(self):
         """
@@ -398,7 +394,20 @@ class Architecture:
         for param in self._model.parameters():
             param.requires_grad = False
 
+
+
+        # Handle the auxilary net
+        num_ftrs = self._model.AuxLogits.fc.in_features
+        self._model.AuxLogits.fc = nn.Linear(num_ftrs, N_CLASSES)
+        # Handle the primary net
+        num_ftrs = self._model.fc.in_features
+        self._model.fc = nn.Linear(num_ftrs, N_CLASSES)
+        input_size = 299
+
         # Adapt architecture. Newly created modules have require_grad=True by default
+        aux_n_features = self._model.AuxLogits.fc.in_features
+        self._model.AuxLogits.fc = nn.Linear(aux_n_features, N_CLASSES)
+
         num_features = self._model.fc.in_features
         self._model.fc = nn.Linear(num_features, N_CLASSES)
 
@@ -551,6 +560,8 @@ def train_model(model, device, train_loader, normalization=None):
 
                 optimizer.zero_grad()
                 prediction = model(sample)
+                if ARCHITECTURE == 'inception_v3':
+                    prediction = prediction.logits
                 loss = criterion(prediction, ground)
                 loss.backward()
                 optimizer.step()
