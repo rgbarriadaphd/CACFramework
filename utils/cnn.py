@@ -27,22 +27,27 @@ class Architecture:
     Class to manage the architecture initialization
     """
 
-    def __init__(self, architecture, pretrained=True, seed=None):
+    def __init__(self, architecture, pretrained=True, seed=None, path=None):
         """
         Architecture class constructor
         :param architecture: (str) already existing Pytorch architecture
         :param pretrained: (bool) Whether model has to load train wights or not
         :param seed: (int) If specified, seed to generate fix random numbers
+        :param path: (str) If defined, then the model has to be loaded.
         """
         logging.info(f'Loading architecture {architecture}, pretrained {pretrained}, seed {seed}')
         self._architecture = architecture
         self._pretrained = pretrained
         self._model = None
+        self._path = path
 
         if seed:
             torch.manual_seed(seed)
 
         self._init()
+        if self._path:
+            self._model.load_state_dict(torch.load(self._path))
+            logging.info(f'Loading {self._architecture} from {self._path}')
 
     def _init(self):
         """
@@ -77,38 +82,39 @@ class Architecture:
         elif self._architecture.startswith('regnet'):
             self._init_regnet()
 
-    def _compute_weights_sum(self, model):
+    def _compute_weights_sum(self, architecture, model):
         """
         Compute weights sum
+        :param architecture: (str) architecture name
         :param model: (torch.models) model
         """
-        if self._architecture.startswith('vgg'):
+        if architecture.startswith('vgg'):
             return model.classifier[6].weight.sum()
-        elif self._architecture.startswith('resnet'):
+        elif architecture.startswith('resnet'):
             return self._model.fc.weight.sum()
-        elif self._architecture.startswith('efficientnet'):
+        elif architecture.startswith('efficientnet'):
             return model.classifier[1].weight.sum()
-        elif self._architecture == 'inception_v3':
+        elif architecture == 'inception_v3':
             return self._model.fc.weight.sum()
-        elif self._architecture == 'alexnet':
+        elif architecture == 'alexnet':
             return model.classifier[6].weight.sum()
-        elif self._architecture == 'squeezenet1_1':
+        elif architecture == 'squeezenet1_1':
             return model.classifier[1].weight.sum()
-        elif self._architecture.startswith('densenet'):
+        elif architecture.startswith('densenet'):
             return model.classifier.weight.sum()
-        elif self._architecture == 'googlenet':
+        elif architecture == 'googlenet':
             return model.fc.weight.sum()
-        elif self._architecture.startswith('shufflenet'):
+        elif architecture.startswith('shufflenet'):
             return model.fc.weight.sum()
-        elif self._architecture.startswith('mobilenet'):
+        elif architecture.startswith('mobilenet'):
             return model.classifier[self._index].weight.sum()
-        elif self._architecture.startswith('mnasnet'):
+        elif architecture.startswith('mnasnet'):
             return model.classifier[1].weight.sum()
-        elif self._architecture.startswith('resnext'):
+        elif architecture.startswith('resnext'):
             return model.fc.weight.sum()
-        elif self._architecture.startswith('wideresnet'):
+        elif architecture.startswith('wideresnet'):
             return model.fc.weight.sum()
-        elif self._architecture.startswith('regnet'):
+        elif architecture.startswith('regnet'):
             return model.fc.weight.sum()
 
     def _init_regnet(self):
@@ -515,12 +521,13 @@ class Architecture:
         """
         return self._weights_sum
 
-    def compute_weights_external(self, model):
+    def compute_weights_external(self, architecture, model):
         """
-        Giving a external model, compute corresponding weights sum
+        Giving an external model, compute corresponding weights sum
+        :param architecture: (str) architecture name
         :param model: (torch.models) model
         """
-        return self._compute_weights_sum(model)
+        return self._compute_weights_sum(architecture, model)
 
 
 def train_model(model, device, train_loader, normalization=None):

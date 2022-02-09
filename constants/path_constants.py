@@ -25,6 +25,12 @@ assert os.path.exists(DYNAMIC_RUN_FOLDER)
 MODELS_FOLDER = 'models'
 assert os.path.exists(MODELS_FOLDER)
 
+TEMPLATES_FOLDER = 'templates'
+assert os.path.exists(TEMPLATES_FOLDER)
+
+OUTPUT_FOLDER = 'output'
+assert os.path.exists(OUTPUT_FOLDER)
+
 LOGS_FOLDER = 'logs'
 assert os.path.exists(LOGS_FOLDER)
 

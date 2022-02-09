@@ -15,6 +15,7 @@ import shutil
 from constants.path_constants import *
 from constants.train_constants import *
 from actions.model_train import ModelTrain
+from actions.model_experiments import Experiment1
 
 
 def request_param(param, args):
@@ -59,9 +60,13 @@ def model_experiment(args):
 
     value = request_param('id', args)
     id_experiment = value if value else '1'
+    id_experiment = int(id_experiment)
 
     logging.info(f'Launching Experiment {id_experiment} of model {model} ')
+    if id_experiment == 1:
+        exp = Experiment1(model)
 
+    exp.run()
 
 def get_execution_time():
     """
