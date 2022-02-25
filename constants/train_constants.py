@@ -18,7 +18,7 @@ CRITERION = 'CrossEntropyLoss'
 OPTIMIZER = 'SDG'
 # Architecture parameters
 # =======================
-ARCHITECTURE = "inception_v3"
+ARCHITECTURE = "vgg16"
 # model architecture supported:
 # ['regnet_y_400mf','regnet_y_800mf','regnet_y_1_6gf','regnet_y_3_2gf','regnet_y_8gf','regnet_y_16gf','regnet_y_32gf',
 # 'regnet_x_400mf','regnet_x_800mf','regnet_x_1_6gf','regnet_x_3_2gf','regnet_x_8gf','regnet_x_16gf','regnet_x_32gf',
@@ -32,10 +32,11 @@ IMAGE_TYPE = 'cropped'  # Input datset type. Supported --> ['original', 'cropped
 MODEL_SEED = 3  # Fix seed to generate always deterministic results (same random numbers)
 N_CLASSES = 2  # Number of classes (CAC>400, CAC<400)
 CUSTOM_NORMALIZED = True  # Retrieve normalization parameters by analysing input train images
+REQUIRES_GRAD = True  # Allow backprop in pretrained weights
 
 # Output parameters
 # =======================
-SAVE_MODEL = False  # True if model has to be saved
+SAVE_MODEL = True  # True if model has to be saved
 SAVE_LOSS_PLOT = False  # True if loss plot has to be saved
 SAVE_ACCURACY_PLOT = False  # True if accuracy plot has to be saved
 MONO_FOLD = False  # Run only one Fold

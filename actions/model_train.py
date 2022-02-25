@@ -169,6 +169,7 @@ class ModelTrain:
             'weight_decay': WEIGHT_DECAY,
             'criterion': CRITERION,
             'optimizer': OPTIMIZER,
+            'device': self._device
         }
 
         for fold in folds_performance:
@@ -226,7 +227,7 @@ class ModelTrain:
                                                          )
             tf_fold_train = time.time() - t0_fold_train
 
-            post_weights = self._architecture.compute_weights_external(fold_model)
+            post_weights = self._architecture.compute_weights_external(ARCHITECTURE, fold_model)
             logging.info(f'Post train step fold model weights: {post_weights}')
 
             # Test model. Test step over train model in current fold
@@ -236,7 +237,7 @@ class ModelTrain:
                                                        std=self._normalization[1])
             # Measure test time
             t0_fold_test = time.time()
-            model_performance, fold_accuracy = evaluate_model(fold_model, test_data_loader, self._device, fold_id)
+            model_performance, fold_accuracy, _ = evaluate_model(fold_model, test_data_loader, self._device, fold_id)
             tf_fold_test = time.time() - t0_fold_test
             folds_acc.append(fold_accuracy)
 

@@ -108,13 +108,30 @@ def write_latex_table(model_parameters):
         f_out.write('\end{table}\n')
 
 
+def is_computed(model):
+    """
+    Check if a model has already been executed
+    :param model: (model) The model
+    :return: True if the model has been computed, False otherwise
+    """
+    for folder in os.listdir('models'):
+        if f'train_{model}' in folder:
+            summary_file = os.path.join('models', folder, 'summary.out')
+            if os.path.exists(summary_file):
+                return True
+    return False
+
 def run_all(args):
     models_parameters = dict.fromkeys(ARCHITECTURES)
     for model in ARCHITECTURES:
-        if len(args) == 1:
-            modify_input_architecture(model)
-            os.system("python cac_main.py -tr")
-        models_parameters[model] = get_model_parameters(model)
+        if not is_computed(model):
+            print(f'{model} not computed, launch train process')
+            if len(args) == 1:
+                modify_input_architecture(model)
+                os.system("python cac_main.py -tr")
+            models_parameters[model] = get_model_parameters(model)
+        else:
+            print(f'{model} already computed')
     write_latex_table(models_parameters)
 
 

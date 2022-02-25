@@ -10,6 +10,7 @@ Images: $image_type
 Normalized: $normalized
 Save model: $save_model
 Plot Loss: $plot_loss
+Device: $device
 Hyperparams:
 	Epochs: $epochs
 	Batch size: $batch_size

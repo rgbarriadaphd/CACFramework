@@ -15,7 +15,7 @@ import shutil
 from constants.path_constants import *
 from constants.train_constants import *
 from actions.model_train import ModelTrain
-from actions.model_experiments import Experiment1
+from actions.model_experiments import Experiment1, Experiment2
 
 
 def request_param(param, args):
@@ -52,9 +52,7 @@ def model_experiment(args):
         return
 
     model = request_param('model', args)
-    if os.path.exists(model):
-        logging.info(f'Launching TEST step of model stored in: {model}')
-    else:
+    if not os.path.exists(model):
         logging.info(f'Model: {model} cannot be found')
         return
 
@@ -65,8 +63,11 @@ def model_experiment(args):
     logging.info(f'Launching Experiment {id_experiment} of model {model} ')
     if id_experiment == 1:
         exp = Experiment1(model)
+    if id_experiment == 2:
+        exp = Experiment2(model)
 
     exp.run()
+
 
 def get_execution_time():
     """

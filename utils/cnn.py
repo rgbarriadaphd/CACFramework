@@ -46,7 +46,7 @@ class Architecture:
 
         self._init()
         if self._path:
-            self._model.load_state_dict(torch.load(self._path))
+            self._model.load_state_dict(torch.load(self._path, map_location=torch.device('cpu')))
             logging.info(f'Loading {self._architecture} from {self._path}')
 
     def _init(self):
@@ -89,17 +89,17 @@ class Architecture:
         :param model: (torch.models) model
         """
         if architecture.startswith('vgg'):
-            return model.classifier[6].weight.sum()
+            return model.classifier[self._index].weight.sum()
         elif architecture.startswith('resnet'):
             return self._model.fc.weight.sum()
         elif architecture.startswith('efficientnet'):
-            return model.classifier[1].weight.sum()
+            return model.classifier[self._index].weight.sum()
         elif architecture == 'inception_v3':
             return self._model.fc.weight.sum()
         elif architecture == 'alexnet':
-            return model.classifier[6].weight.sum()
+            return model.classifier[self._index].weight.sum()
         elif architecture == 'squeezenet1_1':
-            return model.classifier[1].weight.sum()
+            return model.classifier[self._index].weight.sum()
         elif architecture.startswith('densenet'):
             return model.classifier.weight.sum()
         elif architecture == 'googlenet':
@@ -109,7 +109,7 @@ class Architecture:
         elif architecture.startswith('mobilenet'):
             return model.classifier[self._index].weight.sum()
         elif architecture.startswith('mnasnet'):
-            return model.classifier[1].weight.sum()
+            return model.classifier[self._index].weight.sum()
         elif architecture.startswith('resnext'):
             return model.fc.weight.sum()
         elif architecture.startswith('wideresnet'):
@@ -151,17 +151,7 @@ class Architecture:
         elif self._architecture == 'regnet_x_32gf':
             self._model = models.regnet_x_32gf(pretrained=True)
 
-        # Freeze trained weights
-        for param in self._model.parameters():
-            param.requires_grad = False
-
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.fc.in_features
-        linear = nn.Linear(num_features, N_CLASSES)
-        self._model.fc = linear  # Replace the model classifier
-
-        # Base weights sum
-        self._weights_sum = self._model.fc.weight.sum()
+        self._modify_architecture_fc()
 
     def _init_wide_resnet(self):
         """
@@ -173,17 +163,7 @@ class Architecture:
         elif self._architecture == 'wide_resnet101_2':
             self._model = models.wide_resnet101_2(pretrained=self._pretrained)
 
-        # Freeze trained weights
-        for param in self._model.parameters():
-            param.requires_grad = False
-
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.fc.in_features
-        linear = nn.Linear(num_features, N_CLASSES)
-        self._model.fc = linear  # Replace the model classifier
-
-        # Base weights sum
-        self._weights_sum = self._model.fc.weight.sum()
+        self._modify_architecture_fc()
 
     def _init_resnext(self):
         """
@@ -195,17 +175,7 @@ class Architecture:
         elif self._architecture == 'shufflenet_v2_x1_0':
             self._model = models.resnext101_32x8d(pretrained=self._pretrained)
 
-        # Freeze trained weights
-        for param in self._model.parameters():
-            param.requires_grad = False
-
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.fc.in_features
-        linear = nn.Linear(num_features, N_CLASSES)
-        self._model.fc = linear  # Replace the model classifier
-
-        # Base weights sum
-        self._weights_sum = self._model.fc.weight.sum()
+        self._modify_architecture_fc()
 
     def _init_mnasnet(self):
         """
@@ -217,20 +187,8 @@ class Architecture:
         elif self._architecture == 'mnasnet1_0':
             self._model = models.mnasnet1_0(pretrained=self._pretrained)
 
-        # Freeze trained weights
-        for param in self._model.parameters():
-            param.requires_grad = False
-
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.classifier[1].in_features
-        features = list(self._model.classifier.children())[:-1]  # Remove last layer
-        linear = nn.Linear(num_features, N_CLASSES)
-
-        features.extend([linear])  # Add our layer with 2 outputs
-        self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
-
-        # Base weights sum
-        self._weights_sum = self._model.classifier[1].weight.sum()
+        self._index = 1
+        self._modify_architecture_classifier()
 
     def _init_mobilenet(self):
         """
@@ -247,20 +205,7 @@ class Architecture:
             self._model = models.mobilenet_v3_large(pretrained=self._pretrained)
             self._index = 3
 
-        # Freeze trained weights
-        for param in self._model.features.parameters():
-            param.requires_grad = False
-
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.classifier[self._index].in_features
-        features = list(self._model.classifier.children())[:-1]  # Remove last layer
-        linear = nn.Linear(num_features, N_CLASSES)
-
-        features.extend([linear])  # Add our layer with 2 outputs
-        self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
-
-        # Base weights sum
-        self._weights_sum = self._model.classifier[self._index].weight.sum()
+        self._modify_architecture_classifier()
 
     def _init_shufflenet(self):
         """
@@ -272,17 +217,7 @@ class Architecture:
         elif self._architecture == 'shufflenet_v2_x1_0':
             self._model = models.shufflenet_v2_x1_0(pretrained=self._pretrained)
 
-        # Freeze trained weights
-        for param in self._model.parameters():
-            param.requires_grad = False
-
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.fc.in_features
-        linear = nn.Linear(num_features, N_CLASSES)
-        self._model.fc = linear  # Replace the model classifier
-
-        # Base weights sum
-        self._weights_sum = self._model.fc.weight.sum()
+        self.modify_architecture_fc()
 
     def _init_googlenet(self):
         """
@@ -292,17 +227,7 @@ class Architecture:
         if self._architecture == 'googlenet':
             self._model = models.googlenet(pretrained=self._pretrained)
 
-        # Freeze trained weights
-        for param in self._model.parameters():
-            param.requires_grad = False
-
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.fc.in_features
-        linear = nn.Linear(num_features, N_CLASSES)
-        self._model.fc = linear  # Replace the model classifier
-
-        # Base weights sum
-        self._weights_sum = self._model.fc.weight.sum()
+        self._modify_architecture_fc()
 
     def _init_densenet(self):
         """
@@ -320,7 +245,7 @@ class Architecture:
 
         # Freeze trained weights
         for param in self._model.features.parameters():
-            param.requires_grad = False
+            param.requires_grad = REQUIRES_GRAD
 
         # Adapt architecture. Newly created modules have require_grad=True by default
         num_features = self._model.classifier.in_features
@@ -340,8 +265,7 @@ class Architecture:
 
         # Freeze trained weights
         for param in self._model.features.parameters():
-            param.requires_grad = False
-
+            param.requires_grad = REQUIRES_GRAD
 
         # Adapt architecture. Newly created modules have require_grad=True by default
         self._model.classifier[1] = nn.Conv2d(512, N_CLASSES, kernel_size=(1, 1), stride=(1, 1))
@@ -371,21 +295,8 @@ class Architecture:
         elif self._architecture == 'efficientnet_b7':
             self._model = models.efficientnet_b7(pretrained=self._pretrained)
 
-        # FIXME
-        # Freeze trained weights
-        for param in self._model.features.parameters():
-            param.requires_grad = False
-
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.classifier[1].in_features
-        features = list(self._model.classifier.children())[:-1]  # Remove last layer
-        linear = nn.Linear(num_features, N_CLASSES)
-
-        features.extend([linear])  # Add our layer with 2 outputs
-        self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
-
-        # Base weights sum
-        self._weights_sum = self._model.classifier[1].weight.sum()
+        self._index = 1
+        self._modify_architecture_classifier()
 
     def _init_inception_v3(self):
         """
@@ -398,9 +309,7 @@ class Architecture:
         # FIXME
         # Freeze trained weights
         for param in self._model.parameters():
-            param.requires_grad = False
-
-
+            param.requires_grad = REQUIRES_GRAD
 
         # Handle the auxilary net
         num_ftrs = self._model.AuxLogits.fc.in_features
@@ -428,21 +337,8 @@ class Architecture:
         if self._architecture == 'alexnet':
             self._model = models.alexnet(pretrained=self._pretrained)
 
-        # FIXME
-        # Freeze trained weights
-        for param in self._model.features.parameters():
-            param.requires_grad = False
-
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.classifier[6].in_features
-        features = list(self._model.classifier.children())[:-1]  # Remove last layer
-        linear = nn.Linear(num_features, N_CLASSES)
-
-        features.extend([linear])  # Add our layer with 2 outputs
-        self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
-
-        # Base weights sum
-        self._weights_sum = self._model.classifier[6].weight.sum()
+        self._index = 6
+        self._modify_architecture_classifier()
 
     def _init_vgg(self):
         """
@@ -466,20 +362,8 @@ class Architecture:
         elif self._architecture == 'vgg13_bn':
             self._model = models.vgg13_bn(pretrained=self._pretrained)
 
-        # Freeze trained weights
-        for param in self._model.features.parameters():
-            param.requires_grad = False
-
-        # Adapt architecture. Newly created modules have require_grad=True by default
-        num_features = self._model.classifier[6].in_features
-        features = list(self._model.classifier.children())[:-1]  # Remove last layer
-        linear = nn.Linear(num_features, N_CLASSES)
-
-        features.extend([linear])  # Add our layer with 2 outputs
-        self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
-
-        # Base weights sum
-        self._weights_sum = self._model.classifier[6].weight.sum()
+        self._index = 6
+        self._modify_architecture_classifier()
 
     def _init_resnet(self):
         """
@@ -497,9 +381,13 @@ class Architecture:
         elif self._architecture == 'resnet152':
             self._model = models.resnet152(pretrained=self._pretrained)
 
+        self._modify_architecture_fc()
+
+    def _modify_architecture_fc(self):
+
         # Freeze trained weights
         for param in self._model.parameters():
-            param.requires_grad = False
+            param.requires_grad = REQUIRES_GRAD
 
         # Adapt architecture. Newly created modules have require_grad=True by default
         num_features = self._model.fc.in_features
@@ -508,6 +396,23 @@ class Architecture:
 
         # Base weights sum
         self._weights_sum = self._model.fc.weight.sum()
+
+    def _modify_architecture_classifier(self):
+
+        # Freeze trained weights
+        for param in self._model.features.parameters():
+            param.requires_grad = REQUIRES_GRAD
+
+        # Adapt architecture. Newly created modules have require_grad=True by default
+        num_features = self._model.classifier[self._index].in_features
+        features = list(self._model.classifier.children())[:-1]  # Remove last layer
+        linear = nn.Linear(num_features, N_CLASSES)
+
+        features.extend([linear])  # Add our layer with 2 outputs
+        self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
+
+        # Base weights sum
+        self._weights_sum = self._model.classifier[self._index].weight.sum()
 
     def get(self):
         """
@@ -603,7 +508,7 @@ def evaluate_model(model, test_loader, device, fold_id):
             and confusion matrix
     """
     n_test = len(test_loader.dataset)
-    logging.info(f'''Starting training:
+    logging.info(f'''Starting tesing:
             Test size:  {n_test}
             Device:     {device.type}
             Fold ID:    {fold_id}
@@ -613,6 +518,7 @@ def evaluate_model(model, test_loader, device, fold_id):
     total = 0
     ground_array = []
     prediction_array = []
+    dataset_info = {}
     model.eval()
     with torch.no_grad():
         for i, data in enumerate(test_loader):
@@ -622,6 +528,12 @@ def evaluate_model(model, test_loader, device, fold_id):
 
             outputs = model(sample)
             _, predicted = torch.max(outputs.data, 1)
+
+            sample_name = file_info[0][0].split('/')[-1].split('.')[0]
+            dataset_info[sample_name] = {'ground': None, 'prediction': None}
+            assert ground.item() == file_info[1][0]
+            dataset_info[sample_name]['ground'] = ground.item()
+            dataset_info[sample_name]['prediction'] = predicted.item()
 
             ground_array.append(ground.item())
             prediction_array.append(predicted.item())
@@ -644,4 +556,4 @@ def evaluate_model(model, test_loader, device, fold_id):
                f'fp_{fold_id}': confusion_matrix[1],
                f'fn_{fold_id}': confusion_matrix[2],
                f'tp_{fold_id}': confusion_matrix[3]
-           }, (100 * correct) / total
+           }, (100 * correct) / total, dataset_info
