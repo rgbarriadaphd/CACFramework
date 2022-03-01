@@ -56,16 +56,19 @@ def modify_input_architecture(model):
         f_out.writelines(new_lines)
 
 
-def get_model_parameters(model):
+def get_model_parameters(model, model_folder='models'):
     """
     Retrieve the performance parameters from the summary of a specific model
+    :param model_folder: (str) input path for models folder
     :param model: (str) Current architecture
     """
     folds_acc, mean, stddev, interval = None, None, None, None
-    for folder in os.listdir('models'):
+    print(model_folder)
+    for folder in os.listdir(model_folder):
         if f'train_{model}' in folder:
-            summary_file = os.path.join('models', folder, 'summary.out')
-            assert os.path.exists(summary_file)
+            summary_file = os.path.join(model_folder, folder, 'summary.out')
+
+            assert os.path.exists(summary_file), f'{summary_file} not found'
             with open(summary_file, 'r') as f_in:
                 for line in f_in.readlines():
                     if line.startswith('Folds Acc.'):
@@ -80,12 +83,13 @@ def get_model_parameters(model):
     return folds_acc, mean, stddev, interval
 
 
-def write_latex_table(model_parameters):
+def write_latex_table(model_parameters, output_file='templates/models.latex'):
     """
     Write a latex table format with all models performance
+    :param output_file: (str) path to output file
     :param model_parameters: (dict) Contains model performance by mdoel
     """
-    with open('templates/models.latex', 'w') as f_out:
+    with open(output_file, 'w') as f_out:
         f_out.write('\\begin{table}[H]\n')
         f_out.write('\caption{Python architecture main models performance.}\n')
         f_out.write('\centering\n')
@@ -123,16 +127,25 @@ def is_computed(model):
 
 def run_all(args):
     models_parameters = dict.fromkeys(ARCHITECTURES)
-    for model in ARCHITECTURES:
-        if not is_computed(model):
-            print(f'{model} not computed, launch train process')
-            if len(args) == 1:
-                modify_input_architecture(model)
-                os.system("python cac_main.py -tr")
-            models_parameters[model] = get_model_parameters(model)
-        else:
-            print(f'{model} already computed')
-    write_latex_table(models_parameters)
+
+    #TODO: rearrange and think options more robust!!!
+    if len(args) == 3:
+        model_folder = args[1].split('=')[1]
+        out_file = args[2].split('=')[1]
+        for model in ARCHITECTURES:
+            models_parameters[model] = get_model_parameters(model, model_folder)
+        write_latex_table(models_parameters, out_file)
+    else:
+        for model in ARCHITECTURES:
+            if not is_computed(model):
+                print(f'{model} not computed, launch train process')
+                if len(args) == 1:
+                    modify_input_architecture(model)
+                    os.system("python cac_main.py -tr")
+                models_parameters[model] = get_model_parameters(model)
+            else:
+                print(f'{model} already computed')
+        write_latex_table(models_parameters)
 
 
 if __name__ == '__main__':

@@ -217,7 +217,7 @@ class Architecture:
         elif self._architecture == 'shufflenet_v2_x1_0':
             self._model = models.shufflenet_v2_x1_0(pretrained=self._pretrained)
 
-        self.modify_architecture_fc()
+        self._modify_architecture_fc()
 
     def _init_googlenet(self):
         """
@@ -267,11 +267,12 @@ class Architecture:
         for param in self._model.features.parameters():
             param.requires_grad = REQUIRES_GRAD
 
+        self._index = 1
         # Adapt architecture. Newly created modules have require_grad=True by default
-        self._model.classifier[1] = nn.Conv2d(512, N_CLASSES, kernel_size=(1, 1), stride=(1, 1))
+        self._model.classifier[self._index] = nn.Conv2d(512, N_CLASSES, kernel_size=(1, 1), stride=(1, 1))
 
         # Base weights sum
-        self._weights_sum = self._model.classifier[1].weight.sum()
+        self._weights_sum = self._model.classifier[self._index].weight.sum()
 
     def _init_efficientnet(self):
         """
@@ -400,8 +401,12 @@ class Architecture:
     def _modify_architecture_classifier(self):
 
         # Freeze trained weights
-        for param in self._model.features.parameters():
-            param.requires_grad = REQUIRES_GRAD
+        try:
+            for param in self._model.features.parameters():
+                param.requires_grad = REQUIRES_GRAD
+        except:
+            for param in self._model.parameters():
+                param.requires_grad = REQUIRES_GRAD
 
         # Adapt architecture. Newly created modules have require_grad=True by default
         num_features = self._model.classifier[self._index].in_features

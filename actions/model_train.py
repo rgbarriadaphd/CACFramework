@@ -169,7 +169,8 @@ class ModelTrain:
             'weight_decay': WEIGHT_DECAY,
             'criterion': CRITERION,
             'optimizer': OPTIMIZER,
-            'device': self._device
+            'device': self._device,
+            'require_grad': REQUIRES_GRAD
         }
 
         for fold in folds_performance:

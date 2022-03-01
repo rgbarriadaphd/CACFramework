@@ -11,6 +11,7 @@ Normalized: $normalized
 Save model: $save_model
 Plot Loss: $plot_loss
 Device: $device
+Require Grad: $require_grad
 Hyperparams:
 	Epochs: $epochs
 	Batch size: $batch_size

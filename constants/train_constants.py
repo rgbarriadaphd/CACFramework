@@ -10,7 +10,7 @@ LOG_LEVEL = 'info'
 # Train hyperparameters
 # =======================
 
-EPOCHS = 60
+EPOCHS = 500
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0001
 WEIGHT_DECAY = 4e-2
@@ -36,7 +36,7 @@ REQUIRES_GRAD = True  # Allow backprop in pretrained weights
 
 # Output parameters
 # =======================
-SAVE_MODEL = True  # True if model has to be saved
+SAVE_MODEL = False  # True if model has to be saved
 SAVE_LOSS_PLOT = False  # True if loss plot has to be saved
 SAVE_ACCURACY_PLOT = False  # True if accuracy plot has to be saved
 MONO_FOLD = False  # Run only one Fold
