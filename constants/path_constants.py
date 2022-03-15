@@ -42,5 +42,21 @@ CAC_POSITIVE = 'CACSmas400'
 
 # Templates
 
-SUMMARY_TEMPLATE = 'templates/summary.template'
-assert os.path.exists(SUMMARY_TEMPLATE)
+SUMMARY_TEMPLATE_ALL = 'templates/summary.template'
+assert os.path.exists(SUMMARY_TEMPLATE_ALL)
+
+SUMMARY_TEMPLATE_FOLD_1 = 'templates/summary_f1.template'
+assert os.path.exists(SUMMARY_TEMPLATE_FOLD_1)
+
+SUMMARY_TEMPLATE_FOLD_2 = 'templates/summary_f2.template'
+assert os.path.exists(SUMMARY_TEMPLATE_FOLD_2)
+
+SUMMARY_TEMPLATE_FOLD_3 = 'templates/summary_f3.template'
+assert os.path.exists(SUMMARY_TEMPLATE_FOLD_3)
+
+SUMMARY_TEMPLATE_FOLD_4 = 'templates/summary_f4.template'
+assert os.path.exists(SUMMARY_TEMPLATE_FOLD_4)
+
+SUMMARY_TEMPLATE_FOLD_5 = 'templates/summary_f5.template'
+assert os.path.exists(SUMMARY_TEMPLATE_FOLD_5)
+

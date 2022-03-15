@@ -179,8 +179,22 @@ class ModelTrain:
         # Append global performance
         summary_template_values.update(global_performance)
 
+        if FOLDS == 'all':
+            template = SUMMARY_TEMPLATE_ALL
+        elif FOLDS == '1':
+            template = SUMMARY_TEMPLATE_FOLD_1
+        elif FOLDS == '2':
+            template = SUMMARY_TEMPLATE_FOLD_2
+        elif FOLDS == '3':
+            template = SUMMARY_TEMPLATE_FOLD_3
+        elif FOLDS == '4':
+            template = SUMMARY_TEMPLATE_FOLD_4
+        elif FOLDS == '5':
+            template = SUMMARY_TEMPLATE_FOLD_5
+        # TODO: complete other folds
+
         # Substitute values
-        with open(SUMMARY_TEMPLATE, 'r') as f:
+        with open(template, 'r') as f:
             src = Template(f.read())
             report = src.substitute(summary_template_values)
             logging.info(report)
@@ -196,8 +210,10 @@ class ModelTrain:
         t0 = time.time()
         folds_performance = []
         folds_acc = []
-        initweights = self._architecture.weights_sum()
-        for fold_id in range(1, 6):
+        base_weights = self._architecture.weights_sum()
+        logging.info(f'BASE model weights: {base_weights}')
+        folds_ids = range(1, 6) if FOLDS == 'all' else [int(FOLDS)]
+        for fold_id in folds_ids:
             logging.info(f'Processing fold: {fold_id}')
 
             # Generates fold datasets
@@ -207,7 +223,9 @@ class ModelTrain:
             fold_architecture = copy(self._architecture)
             fold_model = fold_architecture.get()
             fold_model.to(device=self._device)
-            logging.info(f'Pre train step fold model weights: {self._architecture.weights_sum()}')
+            fold_weights = self._architecture.weights_sum()
+            logging.info(f'Pre train step fold model weights: {fold_weights}')
+            assert base_weights == fold_weights
 
             # Get dataset normalization mean and std
             self._get_normalization()
@@ -229,6 +247,7 @@ class ModelTrain:
             tf_fold_train = time.time() - t0_fold_train
 
             post_weights = self._architecture.compute_weights_external(ARCHITECTURE, fold_model)
+
             logging.info(f'Post train step fold model weights: {post_weights}')
 
             # Test model. Test step over train model in current fold
@@ -274,9 +293,15 @@ class ModelTrain:
 
         # Compute global performance info
         cvm = CrossValidationMeasures(measures_list=folds_acc, percent=True, formatted=True)
+        f_acc = '['
+        for p, fa in enumerate(folds_acc):
+            f_acc += f'{fa:.{ND}f}'
+            if (p + 1) != len(folds_acc):
+                f_acc += ','
+        f_acc += ']'
         global_performance = {
             'execution_time': str(timedelta(seconds=time.time() - t0)),
-            'folds_accuracy': f'[{folds_acc[0]:.{ND}f}, {folds_acc[1]:.{ND}f}, {folds_acc[2]:.{ND}f}, {folds_acc[3]:.{ND}f}, {folds_acc[4]:.{ND}f}]',
+            'folds_accuracy': f_acc,
             'cross_v_mean': cvm.mean(),
             'cross_v_stddev': cvm.stddev(),
             'cross_v_interval': cvm.interval()

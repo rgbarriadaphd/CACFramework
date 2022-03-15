@@ -1,0 +1,168 @@
+\begin{table}[H]
+\caption{Python architecture main models performance.}
+\centering
+\begin{tabular}{c| c c c }
+	\textbf{Model} & \textbf{Epochs 60 } & \textbf{Epochs 500} & \textbf{Epochs 500 (No freeze)} }\\ 
+	\hline
+	\hline
+	\rowcolor{lime} 
+	regnet\_y\_400mf & 62.16 & 72.43 & 90.00\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_y\_800mf & 72.35 & 80.99 & 91.25\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_y\_1\_6gf & 71.31 & 78.40 & 90.00\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_y\_3\_2gf & 68.55 & 73.24 & 91.25\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_y\_8gf & 69.89 & 79.83 & 89.38\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_y\_16gf & 67.61 & 72.65 & 88.75\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_y\_32gf & 69.85 & 77.87 & 90.62\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_x\_400mf & 67.39 & 75.24 & 91.25\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_x\_800mf & 72.43 & 77.83 & 91.25\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_x\_1\_6gf & 68.60 & 79.70 & 91.88\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_x\_3\_2gf & 70.60 & 76.57 & 89.38\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_x\_8gf & 70.38 & 79.03 & 91.88\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_x\_16gf & 69.76 & 75.77 & 92.50\\ 
+	\hline
+	\rowcolor{lime} 
+	regnet\_x\_32gf & 75.90 & 79.12 & 91.88\\ 
+	\hline
+	\rowcolor{lime} 
+	wide\_resnet50\_2 & 73.73 & 79.12 & 90.00\\ 
+	\hline
+	\rowcolor{lime} 
+	wide\_resnet101\_2 & 70.74 & 81.75 & 87.50\\ 
+	\hline
+	\rowcolor{lime} 
+	resnext50\_32x4d & 71.09 & 75.19 & 89.38\\ 
+	\hline
+	\rowcolor{pink} 
+	shufflenet\_v2\_x1\_0 & 57.72 & 55.85 & 55.85\\ 
+	\hline
+	\rowcolor{cyan} 
+	mnasnet0\_5 & 56.47 & 62.66 & 59.23\\ 
+	\hline
+	\rowcolor{cyan} 
+	mnasnet1\_0 & 62.48 & 78.23 & 76.44\\ 
+	\hline
+	\rowcolor{lime} 
+	mobilenet\_v2 & 77.69 & 80.45 & 90.62\\ 
+	\hline
+	\rowcolor{lime} 
+	mobilenet\_v3\_small & 67.79 & 76.44 & 82.50\\ 
+	\hline
+	\rowcolor{lime} 
+	mobilenet\_v3\_large & 70.91 & 81.43 & 90.00\\ 
+	\hline
+	\rowcolor{pink} 
+	shufflenet\_v2\_x0\_5 & 57.10 & 55.85 & 55.85\\ 
+	\hline
+	\rowcolor{lime} 
+	googlenet & 66.62 & 73.40 & 87.50\\ 
+	\hline
+	\rowcolor{lime} 
+	densenet121 & 71.36 & 78.62 & 90.62\\ 
+	\hline
+	\rowcolor{lime} 
+	densenet161 & 74.52 & 85.54 & 91.25\\ 
+	\hline
+	\rowcolor{lime} 
+	densenet169 & 73.98 & 79.70 & 88.12\\ 
+	\hline
+	\rowcolor{lime} 
+	densenet201 & 74.93 & 82.95 & 91.25\\ 
+	\hline
+	\rowcolor{lime} 
+	squeezenet1\_1 & 64.66 & 66.14 & 86.21\\ 
+	\hline
+	\rowcolor{lime} 
+	efficientnet\_b0 & 64.76 & 74.65 & 86.25\\ 
+	\hline
+	\rowcolor{lime} 
+	efficientnet\_b1 & 67.79 & 77.73 & 87.50\\ 
+	\hline
+	\rowcolor{lime} 
+	efficientnet\_b2 & 71.18 & 77.47 & 88.75\\ 
+	\hline
+	\rowcolor{lime} 
+	efficientnet\_b3 & 68.01 & 80.90 & 87.50\\ 
+	\hline
+	\rowcolor{lime} 
+	efficientnet\_b4 & 59.90 & 67.83 & 70.33\\ 
+	\hline
+	\rowcolor{lime} 
+	efficientnet\_b5 & 65.88 & 75.73 & 86.25\\ 
+	\hline
+	\rowcolor{lime} 
+	efficientnet\_b6 & 65.64 & 74.11 & 74.87\\ 
+	\hline
+	\rowcolor{lime} 
+	efficientnet\_b7 & 68.45 & 78.54 & 84.38\\ 
+	\hline
+	\rowcolor{lime} 
+	inception\_v3 & 67.39 & 77.07 & 91.88\\ 
+	\hline
+	\rowcolor{lime} 
+	alexnet & 72.38 & 84.96 & 88.12\\ 
+	\hline
+	\rowcolor{cyan} 
+	vgg16 & 75.90 & 88.75 & 88.12\\ 
+	\hline
+	\rowcolor{lime} 
+	vgg19 & 75.77 & 89.38 & 90.62\\ 
+	\hline
+	\rowcolor{lime} 
+	vgg11 & 77.33 & 87.50 & 91.25\\ 
+	\hline
+	\rowcolor{lime} 
+	vgg13 & 75.14 & 88.75 & 90.62\\ 
+	\hline
+	\rowcolor{cyan} 
+	vgg16\_bn & 75.90 & 88.75 & 88.12\\ 
+	\hline
+	vgg19\_bn & 75.77 & 91.88 & 91.88\\ 
+	\hline
+	\rowcolor{lime} 
+	vgg11\_bn & 72.70 & 87.50 & 88.12\\ 
+	\hline
+	\rowcolor{lime} 
+	vgg13\_bn & 75.14 & 88.75 & 90.62\\ 
+	\hline
+	\rowcolor{lime} 
+	resnet18 & 63.99 & 73.14 & 91.25\\ 
+	\hline
+	\rowcolor{lime} 
+	resnet34 & 71.98 & 80.46 & 90.62\\ 
+	\hline
+	\rowcolor{lime} 
+	resnet50 & 72.43 & 77.87 & 90.00\\ 
+	\hline
+	\rowcolor{lime} 
+	resnet101 & 69.84 & 76.40 & 89.38\\ 
+	\hline
+	\rowcolor{lime} 
+	resnet152 & 68.60 & 74.57 & 90.62\\ 
+	\hline
+\end{tabular}
+\label{tab:pythorch_models}
+\end{table}

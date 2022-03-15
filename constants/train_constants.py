@@ -10,7 +10,7 @@ LOG_LEVEL = 'info'
 # Train hyperparameters
 # =======================
 
-EPOCHS = 500
+EPOCHS = 2
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0001
 WEIGHT_DECAY = 4e-2
@@ -39,5 +39,6 @@ REQUIRES_GRAD = True  # Allow backprop in pretrained weights
 SAVE_MODEL = False  # True if model has to be saved
 SAVE_LOSS_PLOT = False  # True if loss plot has to be saved
 SAVE_ACCURACY_PLOT = False  # True if accuracy plot has to be saved
-MONO_FOLD = False  # Run only one Fold
+MONO_FOLD = False  # Run only first Fold (for test)
+FOLDS = 'all' # Run all folds or specify '1' .. '5'
 ND = 2  # Number of decimals at outputs

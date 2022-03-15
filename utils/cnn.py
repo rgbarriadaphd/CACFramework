@@ -89,7 +89,10 @@ class Architecture:
         :param model: (torch.models) model
         """
         if architecture.startswith('vgg'):
-            return model.classifier[self._index].weight.sum()
+            w = 0
+            for name, param in model.named_parameters():
+                w += param.cpu().detach().numpy().sum()
+            return w
         elif architecture.startswith('resnet'):
             return self._model.fc.weight.sum()
         elif architecture.startswith('efficientnet'):
@@ -417,7 +420,12 @@ class Architecture:
         self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
 
         # Base weights sum
-        self._weights_sum = self._model.classifier[self._index].weight.sum()
+        # self._weights_sum = self._model.classifier[self._index].weight.sum()
+        w = 0
+        for name, param in self._model.named_parameters():
+            w += param.cpu().detach().numpy().sum()
+        self._weights_sum = w
+
 
     def get(self):
         """
@@ -494,7 +502,7 @@ def train_model(model, device, train_loader, normalization=None):
                 data_loader = load_and_transform_data(os.path.join(DYNAMIC_RUN_FOLDER, data_element),
                                                       mean=normalization[0],
                                                       std=normalization[1])
-                _, accuracy = evaluate_model(model, data_loader, device, None)
+                _, accuracy, _ = evaluate_model(model, data_loader, device, None)
                 if data_element == TRAIN:
                     train_accuracies.append(accuracy)
                 else:

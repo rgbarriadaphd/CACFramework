@@ -1,0 +1,53 @@
+Train Summary Report
+$datetime
+
+=================================
+Global Configuration:
+---------------------
+
+Architecture: $model
+Images: $image_type
+Normalized: $normalized
+Save model: $save_model
+Plot Loss: $plot_loss
+Device: $device
+Require Grad: $require_grad
+Hyperparams:
+	Epochs: $epochs
+	Batch size: $batch_size
+	Learning rate: $learning_rate
+	Weight Decay: $weight_decay
+	Criterion: $criterion
+	Optimizer: $optimizer
+
+
+=================================
+Fold results:
+---------------------
+
+
+Fold [$fold_id_3]: train ($n_train_3) / test ($n_test_3)
+	Normalization: (mean=$mean_3, std=$std_3)
+	Elapsed time: train=$fold_train_time_3, test=$fold_test_time_3
+	Accuracy: $accuracy_3
+	Precision: $precision_3
+	Recall: $recall_3
+	F1: $f1_3
+	Confusion Matrix: $tn_3 , $fp_3
+	                  $fn_3 , $tp_3
+
+=================================
+Global Performance:
+---------------------
+
+Elapsed total time: $execution_time.
+Folds Acc.: $folds_accuracy
+Mean: $cross_v_mean
+StdDev: $cross_v_stddev
+CI:(95%) : $cross_v_interval
+
+
+
+
+
+

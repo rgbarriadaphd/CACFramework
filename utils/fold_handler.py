@@ -50,10 +50,11 @@ class FoldHandler:
 
         train_folds_mas = []
         train_folds_menos = []
+
         for fold_id in range(0, self._nfolds):
             org_mas = os.path.join(self._fold_base, FOLD_ID + str(fold_id + 1), CAC_POSITIVE)
             org_menos = os.path.join(self._fold_base, FOLD_ID + str(fold_id + 1), CAC_NEGATIVE)
-            if fold_id + 1 == test_fold_id:
+            if (fold_id + 1) == test_fold_id:
                 test_set[CAC_POSITIVE] = [item.split('.')[0] for item in os.listdir(org_mas)]
                 test_set[CAC_NEGATIVE] = [item.split('.')[0] for item in os.listdir(org_menos)]
                 # Copy test fold
