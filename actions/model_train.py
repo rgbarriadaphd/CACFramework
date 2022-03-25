@@ -9,7 +9,7 @@ Description: Class to handle train stages
 import logging
 import torch
 import time
-from copy import copy
+from copy import copy, deepcopy
 from datetime import datetime, timedelta
 import numpy as np
 import matplotlib.pyplot as plt
@@ -34,13 +34,13 @@ class ModelTrain:
         :param images: (str) supported dataset as input
         :param date_time: (str) date and time to identify execution
         """
-        self._architecture = architecture
         self._images = images
         self._date_time = date_time
         self._create_train_folder()
         self._init_device()
         self._generate_fold_data()
-        self._init_model()
+
+
 
     def _create_train_folder(self):
         """
@@ -80,9 +80,8 @@ class ModelTrain:
         Gathers model architecture
         :return:
         """
-        self._architecture = Architecture(self._architecture, seed=MODEL_SEED)
+        self._architecture = Architecture(ARCHITECTURE, seed=MODEL_SEED)
         self._model = self._architecture.get()
-        logging.info(f'Init model with weights: {self._architecture.weights_sum()}')
 
     def _get_normalization(self):
         """
@@ -210,22 +209,27 @@ class ModelTrain:
         t0 = time.time()
         folds_performance = []
         folds_acc = []
-        base_weights = self._architecture.weights_sum()
-        logging.info(f'BASE model weights: {base_weights}')
+
+        # base_weights = self._architecture.weights_sum()
+        # logging.info(f'Base model weights: {base_weights}')
         folds_ids = range(1, 6) if FOLDS == 'all' else [int(FOLDS)]
+
         for fold_id in folds_ids:
             logging.info(f'Processing fold: {fold_id}')
 
             # Generates fold datasets
             train_data, test_data = self._fold_handler.generate_run_set(fold_id)
 
+            self._init_model()
+
             # At each iteration the model should remain the same, so conditions are equal in each fold.
-            fold_architecture = copy(self._architecture)
+            fold_architecture = self._architecture
             fold_model = fold_architecture.get()
             fold_model.to(device=self._device)
-            fold_weights = self._architecture.weights_sum()
+            fold_weights = fold_architecture.weights_sum()
+            fold_weights = fold_architecture.compute_weights_external(ARCHITECTURE, fold_model)
             logging.info(f'Pre train step fold model weights: {fold_weights}')
-            assert base_weights == fold_weights
+            # assert base_weights == fold_weights
 
             # Get dataset normalization mean and std
             self._get_normalization()
@@ -246,7 +250,7 @@ class ModelTrain:
                                                          )
             tf_fold_train = time.time() - t0_fold_train
 
-            post_weights = self._architecture.compute_weights_external(ARCHITECTURE, fold_model)
+            post_weights = fold_architecture.compute_weights_external(ARCHITECTURE, fold_model)
 
             logging.info(f'Post train step fold model weights: {post_weights}')
 
@@ -260,6 +264,8 @@ class ModelTrain:
             model_performance, fold_accuracy, _ = evaluate_model(fold_model, test_data_loader, self._device, fold_id)
             tf_fold_test = time.time() - t0_fold_test
             folds_acc.append(fold_accuracy)
+
+            logging.info(f'Fold {fold_id} accuracy over test set: {fold_accuracy}')
 
             # Update fold data
             fold_data = {
