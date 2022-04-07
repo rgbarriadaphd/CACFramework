@@ -12,6 +12,7 @@ Save model: $save_model
 Plot Loss: $plot_loss
 Device: $device
 Require Grad: $require_grad
+Weights Init.: $weight_init
 Hyperparams:
 	Epochs: $epochs
 	Batch size: $batch_size

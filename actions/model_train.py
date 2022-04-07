@@ -68,7 +68,9 @@ class ModelTrain:
         if self._images == 'cropped':
             logging.info(f'Using cropped images')
             self._fold_dataset = ROOT_ORIGINAL_CROP_FOLDS
-
+        elif self._images == 'cropped_nerve':
+            logging.info(f'Using nerve cropped images')
+            self._fold_dataset = ROOT_ORIGINAL_CROP_FOLDS_NERVE
         else:
             logging.info(f'Using original dimensioned images')
             self._fold_dataset = ROOT_ORIGINAL_FOLDS
@@ -169,7 +171,8 @@ class ModelTrain:
             'criterion': CRITERION,
             'optimizer': OPTIMIZER,
             'device': self._device,
-            'require_grad': REQUIRES_GRAD
+            'require_grad': REQUIRES_GRAD,
+            'weight_init' : WEIGHT_INIT
         }
 
         for fold in folds_performance:

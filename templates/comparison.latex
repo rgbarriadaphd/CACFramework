@@ -1,167 +1,144 @@
 \begin{table}[H]
 \caption{Python architecture main models performance.}
 \centering
-\begin{tabular}{c| c c c }
-	\textbf{Model} & \textbf{Epochs 60 } & \textbf{Epochs 500} & \textbf{Epochs 500 (No freeze)} }\\ 
+\begin{tabular}{c| c c c c}
+	\textbf{Model} & \textbf{Epochs 60 } & \textbf{Epochs 500} & \textbf{No Freeze} & \textbf{Nerve centered } \\ 
 	\hline
 	\hline
-	\rowcolor{lime} 
-	regnet\_y\_400mf & 62.16 & 72.43 & 90.00\\ 
+	\rowcolor{YellowGreen} 
+	regnet\_y\_400mf & 51.28 & 57.58 & 57.70& 59.14\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_y\_800mf & 72.35 & 80.99 & 91.25\\ 
+	\rowcolor{YellowGreen} 
+	regnet\_y\_800mf & 60.44 & 63.83 & 60.35& 61.95\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_y\_1\_6gf & 71.31 & 78.40 & 90.00\\ 
+	\rowcolor{YellowGreen} 
+	regnet\_y\_1\_6gf & 61.72 & 62.66 & 59.85& 62.81\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_y\_3\_2gf & 68.55 & 73.24 & 91.25\\ 
+	\rowcolor{YellowGreen} 
+	regnet\_y\_3\_2gf & 59.28 & 59.90 & 59.15& 64.64\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_y\_8gf & 69.89 & 79.83 & 89.38\\ 
+	regnet\_y\_8gf & 59.99 & 60.61 & 59.94& 59.51\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_y\_16gf & 67.61 & 72.65 & 88.75\\ 
+	regnet\_y\_16gf & 52.10 & 61.33 & 57.40& 56.16\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_y\_32gf & 69.85 & 77.87 & 90.62\\ 
+	regnet\_y\_32gf & 57.14 & 57.14 & 57.49& 54.60\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_x\_400mf & 67.39 & 75.24 & 91.25\\ 
+	\rowcolor{YellowGreen} 
+	regnet\_x\_400mf & 51.34 & 61.33 & 56.87& 60.54\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_x\_800mf & 72.43 & 77.83 & 91.25\\ 
+	regnet\_x\_800mf & 53.26 & 61.73 & 59.81& 56.47\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_x\_1\_6gf & 68.60 & 79.70 & 91.88\\ 
+	\rowcolor{YellowGreen} 
+	regnet\_x\_1\_6gf & 61.86 & 58.57 & 57.05& 58.79\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_x\_3\_2gf & 70.60 & 76.57 & 89.38\\ 
+	\rowcolor{YellowGreen} 
+	regnet\_x\_3\_2gf & 52.68 & 57.98 & 56.11& 64.19\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_x\_8gf & 70.38 & 79.03 & 91.88\\ 
+	\rowcolor{YellowGreen} 
+	regnet\_x\_8gf & 61.82 & 63.25 & 62.58& 64.10\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_x\_16gf & 69.76 & 75.77 & 92.50\\ 
+	regnet\_x\_16gf & 58.65 & 61.82 & 64.68& 62.45\\ 
 	\hline
-	\rowcolor{lime} 
-	regnet\_x\_32gf & 75.90 & 79.12 & 91.88\\ 
+	regnet\_x\_32gf & 63.87 & 65.80 & 63.33& 61.83\\ 
 	\hline
-	\rowcolor{lime} 
-	wide\_resnet50\_2 & 73.73 & 79.12 & 90.00\\ 
+	\rowcolor{YellowGreen} 
+	wide\_resnet50\_2 & 63.12 & 63.87 & 58.61& 60.57\\ 
 	\hline
-	\rowcolor{lime} 
-	wide\_resnet101\_2 & 70.74 & 81.75 & 87.50\\ 
+	\rowcolor{YellowGreen} 
+	wide\_resnet101\_2 & 60.17 & 63.34 & 55.88& 56.48\\ 
 	\hline
-	\rowcolor{lime} 
-	resnext50\_32x4d & 71.09 & 75.19 & 89.38\\ 
+	\rowcolor{YellowGreen} 
+	resnext50\_32x4d & 63.26 & 60.03 & 56.01& 60.45\\ 
 	\hline
-	\rowcolor{pink} 
-	shufflenet\_v2\_x1\_0 & 57.72 & 55.85 & 55.85\\ 
+	\rowcolor{YellowGreen} 
+	shufflenet\_v2\_x1\_0 & 53.61 & 55.85 & 55.85& 55.85\\ 
 	\hline
-	\rowcolor{cyan} 
-	mnasnet0\_5 & 56.47 & 62.66 & 59.23\\ 
+	mnasnet0\_5 & 56.51 & 56.51 & 56.47& 55.13\\ 
 	\hline
-	\rowcolor{cyan} 
-	mnasnet1\_0 & 62.48 & 78.23 & 76.44\\ 
+	mnasnet1\_0 & 55.22 & 64.18 & 53.30& 47.68\\ 
 	\hline
-	\rowcolor{lime} 
-	mobilenet\_v2 & 77.69 & 80.45 & 90.62\\ 
+	mobilenet\_v2 & 66.50 & 65.21 & 61.90& 46.78\\ 
 	\hline
-	\rowcolor{lime} 
-	mobilenet\_v3\_small & 67.79 & 76.44 & 82.50\\ 
+	\rowcolor{YellowGreen} 
+	mobilenet\_v3\_small & 60.66 & 59.76 & 57.85& 58.39\\ 
 	\hline
-	\rowcolor{lime} 
-	mobilenet\_v3\_large & 70.91 & 81.43 & 90.00\\ 
+	\rowcolor{YellowGreen} 
+	mobilenet\_v3\_large & 61.73 & 61.01 & 59.14& 62.27\\ 
 	\hline
-	\rowcolor{pink} 
-	shufflenet\_v2\_x0\_5 & 57.10 & 55.85 & 55.85\\ 
+	\rowcolor{YellowGreen} 
+	shufflenet\_v2\_x0\_5 & 47.82 & 55.85 & 55.85& 55.85\\ 
 	\hline
-	\rowcolor{lime} 
-	googlenet & 66.62 & 73.40 & 87.50\\ 
+	googlenet & 55.13 & 62.57 & 59.98& 54.25\\ 
 	\hline
-	\rowcolor{lime} 
-	densenet121 & 71.36 & 78.62 & 90.62\\ 
+	densenet121 & 57.26 & 61.32 & 62.53& 61.91\\ 
 	\hline
-	\rowcolor{lime} 
-	densenet161 & 74.52 & 85.54 & 91.25\\ 
+	densenet161 & 62.62 & 65.43 & 59.90& 58.53\\ 
 	\hline
-	\rowcolor{lime} 
-	densenet169 & 73.98 & 79.70 & 88.12\\ 
+	densenet169 & 58.48 & 57.40 & 59.23& 50.10\\ 
 	\hline
-	\rowcolor{lime} 
-	densenet201 & 74.93 & 82.95 & 91.25\\ 
+	\rowcolor{YellowGreen} 
+	densenet201 & 62.93 & 63.78 & 61.15& 63.12\\ 
 	\hline
-	\rowcolor{lime} 
-	squeezenet1\_1 & 64.66 & 66.14 & 86.21\\ 
+	squeezenet1\_1 & 59.98 & 54.19 & 56.68& 51.88\\ 
 	\hline
-	\rowcolor{lime} 
-	efficientnet\_b0 & 64.76 & 74.65 & 86.25\\ 
+	\rowcolor{YellowGreen} 
+	efficientnet\_b0 & 59.68 & 58.21 & 56.60& 63.48\\ 
 	\hline
-	\rowcolor{lime} 
-	efficientnet\_b1 & 67.79 & 77.73 & 87.50\\ 
+	efficientnet\_b1 & 53.23 & 58.43 & 60.92& 58.61\\ 
 	\hline
-	\rowcolor{lime} 
-	efficientnet\_b2 & 71.18 & 77.47 & 88.75\\ 
+	\rowcolor{YellowGreen} 
+	efficientnet\_b2 & 57.22 & 63.11 & 61.99& 62.99\\ 
 	\hline
-	\rowcolor{lime} 
-	efficientnet\_b3 & 68.01 & 80.90 & 87.50\\ 
+	efficientnet\_b3 & 50.48 & 64.36 & 65.25& 61.60\\ 
 	\hline
-	\rowcolor{lime} 
-	efficientnet\_b4 & 59.90 & 67.83 & 70.33\\ 
+	\rowcolor{YellowGreen} 
+	efficientnet\_b4 & 56.52 & 57.32 & 57.99& 59.86\\ 
 	\hline
-	\rowcolor{lime} 
-	efficientnet\_b5 & 65.88 & 75.73 & 86.25\\ 
+	\rowcolor{YellowGreen} 
+	efficientnet\_b5 & 49.79 & 55.14 & 59.07& 61.20\\ 
 	\hline
-	\rowcolor{lime} 
-	efficientnet\_b6 & 65.64 & 74.11 & 74.87\\ 
+	efficientnet\_b6 & 50.14 & 55.57 & 51.60& 47.02\\ 
 	\hline
-	\rowcolor{lime} 
-	efficientnet\_b7 & 68.45 & 78.54 & 84.38\\ 
+	\rowcolor{YellowGreen} 
+	efficientnet\_b7 & 49.02 & 59.98 & 55.40& 59.99\\ 
 	\hline
-	\rowcolor{lime} 
-	inception\_v3 & 67.39 & 77.07 & 91.88\\ 
+	\rowcolor{YellowGreen} 
+	inception\_v3 & 56.02 & 65.02 & 62.57& 66.20\\ 
 	\hline
-	\rowcolor{lime} 
-	alexnet & 72.38 & 84.96 & 88.12\\ 
+	alexnet & 60.35 & 58.82 & 55.88& 55.62\\ 
 	\hline
-	\rowcolor{cyan} 
-	vgg16 & 75.90 & 88.75 & 88.12\\ 
+	vgg16 & 65.03 & 60.75 & 65.57& 53.80\\ 
 	\hline
-	\rowcolor{lime} 
-	vgg19 & 75.77 & 89.38 & 90.62\\ 
+	\rowcolor{YellowGreen} 
+	vgg19 & 56.82 & 63.11 & 57.99& 60.13\\ 
 	\hline
-	\rowcolor{lime} 
-	vgg11 & 77.33 & 87.50 & 91.25\\ 
+	\rowcolor{YellowGreen} 
+	vgg11 & 63.86 & 60.03 & 54.72& 55.94\\ 
 	\hline
-	\rowcolor{lime} 
-	vgg13 & 75.14 & 88.75 & 90.62\\ 
+	vgg13 & 63.29 & 64.45 & 63.96& 57.86\\ 
 	\hline
-	\rowcolor{cyan} 
-	vgg16\_bn & 75.90 & 88.75 & 88.12\\ 
+	\rowcolor{YellowGreen} 
+	vgg16\_bn & 63.16 & 60.75 & 51.47& 62.94\\ 
 	\hline
-	vgg19\_bn & 75.77 & 91.88 & 91.88\\ 
+	\rowcolor{YellowGreen} 
+	vgg19\_bn & 56.82 & 63.11 & 57.99& 60.13\\ 
 	\hline
-	\rowcolor{lime} 
-	vgg11\_bn & 72.70 & 87.50 & 88.12\\ 
+	\rowcolor{YellowGreen} 
+	vgg11\_bn & 61.33 & 60.03 & 54.72& 60.98\\ 
 	\hline
-	\rowcolor{lime} 
-	vgg13\_bn & 75.14 & 88.75 & 90.62\\ 
+	vgg13\_bn & 61.24 & 64.45 & 63.96& 62.59\\ 
 	\hline
-	\rowcolor{lime} 
-	resnet18 & 63.99 & 73.14 & 91.25\\ 
+	resnet18 & 50.39 & 56.68 & 58.21& 57.01\\ 
 	\hline
-	\rowcolor{lime} 
-	resnet34 & 71.98 & 80.46 & 90.62\\ 
+	resnet34 & 61.90 & 61.15 & 61.38& 48.76\\ 
 	\hline
-	\rowcolor{lime} 
-	resnet50 & 72.43 & 77.87 & 90.00\\ 
+	\rowcolor{YellowGreen} 
+	resnet50 & 61.15 & 61.86 & 58.56& 60.36\\ 
 	\hline
-	\rowcolor{lime} 
-	resnet101 & 69.84 & 76.40 & 89.38\\ 
+	\rowcolor{YellowGreen} 
+	resnet101 & 60.16 & 62.44 & 57.45& 58.48\\ 
 	\hline
-	\rowcolor{lime} 
-	resnet152 & 68.60 & 74.57 & 90.62\\ 
+	resnet152 & 63.12 & 56.52 & 57.99& 55.58\\ 
 	\hline
 \end{tabular}
 \label{tab:pythorch_models}

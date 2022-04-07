@@ -10,7 +10,7 @@ LOG_LEVEL = 'info'
 # Train hyperparameters
 # =======================
 
-EPOCHS = 2
+EPOCHS = 500
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0001
 WEIGHT_DECAY = 4e-2

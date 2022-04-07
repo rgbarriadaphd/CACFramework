@@ -366,6 +366,14 @@ class Architecture:
         elif self._architecture == 'vgg13_bn':
             self._model = models.vgg13_bn(pretrained=self._pretrained)
 
+        print(self._model)
+        for param in self._model.features.parameters():
+            print(param.requires_grad)
+        for param in self._model.classifier.parameters():
+            print(param.requires_grad)
+        for param in self._model.avgpool.parameters():
+            print(param.requires_grad)
+        print("-----------------------------------------------")
         self._index = 6
         self._modify_architecture_classifier()
 
@@ -396,6 +404,21 @@ class Architecture:
         # Adapt architecture. Newly created modules have require_grad=True by default
         num_features = self._model.fc.in_features
         linear = nn.Linear(num_features, N_CLASSES)
+
+        if WEIGHT_INIT == 'XavierUniform':
+            logging.info(f'Init weights: Xavier Uniform')
+            nn.init.xavier_uniform_(linear.weight.data)
+        elif WEIGHT_INIT == 'XavierNormal':
+            logging.info(f'Init weights: Xavier Normal')
+            nn.init.xavier_normal_(linear.weight.data)
+        elif WEIGHT_INIT == 'KaimingUniform':
+            logging.info(f'Init weights: Kaiming Uniform')
+            nn.init.kaiming_uniform_(linear.weight.data, nonlinearity='leaky_relu')
+        elif WEIGHT_INIT == 'KaimingNormal':
+            logging.info(f'Init weights: Kaiming Normal')
+            nn.init.kaiming_normal_(linear.weight.data, nonlinearity='leaky_relu')
+        nn.init.constant_(linear.bias.data, 0)
+
         self._model.fc = linear  # Replace the model classifier
 
         # Base weights sum
@@ -408,6 +431,7 @@ class Architecture:
             for param in self._model.features.parameters():
                 param.requires_grad = REQUIRES_GRAD
         except:
+            print("------en el except")
             for param in self._model.parameters():
                 param.requires_grad = REQUIRES_GRAD
 
@@ -415,6 +439,20 @@ class Architecture:
         num_features = self._model.classifier[self._index].in_features
         features = list(self._model.classifier.children())[:-1]  # Remove last layer
         linear = nn.Linear(num_features, N_CLASSES)
+
+        if WEIGHT_INIT == 'XavierUniform':
+            logging.info(f'Init weights: Xavier Uniform')
+            nn.init.xavier_uniform_(linear.weight.data)
+        elif WEIGHT_INIT == 'XavierNormal':
+            logging.info(f'Init weights: Xavier Normal')
+            nn.init.xavier_normal_(linear.weight.data)
+        elif WEIGHT_INIT == 'KaimingUniform':
+            logging.info(f'Init weights: Kaiming Uniform')
+            nn.init.kaiming_uniform_(linear.weight.data, nonlinearity='leaky_relu')
+        elif WEIGHT_INIT == 'KaimingNormal':
+            logging.info(f'Init weights: Kaiming Normal')
+            nn.init.kaiming_normal_(linear.weight.data, nonlinearity='leaky_relu')
+        nn.init.constant_(linear.bias.data, 0)
 
         features.extend([linear])  # Add our layer with 2 outputs
         self._model.classifier = nn.Sequential(*features)  # Replace the model classifier
@@ -425,7 +463,6 @@ class Architecture:
         for name, param in self._model.named_parameters():
             w += param.cpu().detach().numpy().sum()
         self._weights_sum = w
-
 
     def get(self):
         """
@@ -469,7 +506,19 @@ def train_model(model, device, train_loader, normalization=None):
     ''')
     # TODO: Parametrize optimizer and criterion
     optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
-    criterion = nn.CrossEntropyLoss()
+
+    if CRITERION == 'NegativeLogLikelihood':
+        logging.info('NegativeLogLikelihood criterion')
+        criterion = nn.NLLLoss()
+    elif CRITERION == 'KLDivergence':
+        logging.info('KLDivergence criterion')
+        criterion = nn.KLDivLoss(reduction='batchmean')
+    elif CRITERION == 'MarginRanking':
+        logging.info('MarginRanking criterion')
+        criterion = nn.MarginRankingLoss()
+    else:
+        logging.info('CrossEntropy criterion')
+        criterion = nn.CrossEntropyLoss()
 
     # TODO: Parametrize loss convergence function
     losses = []
@@ -485,8 +534,12 @@ def train_model(model, device, train_loader, normalization=None):
 
                 optimizer.zero_grad()
                 prediction = model(sample)
+
                 if ARCHITECTURE == 'inception_v3':
                     prediction = prediction.logits
+
+                print(prediction.size())
+                print(ground.size())
                 loss = criterion(prediction, ground)
                 loss.backward()
                 optimizer.step()

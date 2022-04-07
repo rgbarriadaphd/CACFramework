@@ -60,9 +60,9 @@ def write_latex_table(model_parameters, output_file='templates/models.latex'):
         f_out.write('\\begin{table}[H]\n')
         f_out.write('\caption{Python architecture main models performance.}\n')
         f_out.write('\centering\n')
-        f_out.write('\\begin{tabular}{c| c c c }\n')
+        f_out.write('\\begin{tabular}{c| c c c c}\n')
         f_out.write(
-            '\t\\textbf{Model} & \\textbf{Epochs 60 } & \\textbf{Epochs 500} & \\textbf{Epochs 500 (No freeze)} }\\\\ \n')
+            '\t\\textbf{Model} & \\textbf{Epochs 60 } & \\textbf{Epochs 500} & \\textbf{No Freeze} & \\textbf{Nerve centered } \\\\ \n')
         f_out.write('\t\hline\n')
         f_out.write('\t\hline\n')
 
@@ -75,16 +75,20 @@ def write_latex_table(model_parameters, output_file='templates/models.latex'):
             if '_' in model:
                 formatted = formatted.replace('_', '\_')
 
-            if (means[0] >= means[1]):
-                f_out.write('\t\\rowcolor{pink} \n')
+            # if (means[0] >= means[1]) and (means[0] >= means[2]):
+            #     f_out.write('\t\\rowcolor{pink} \n')
+            #
+            if means[3] >= means[2]:
+                  f_out.write('\t\\rowcolor{YellowGreen} \n')
+            #
+            # elif (means[1] >= means[0]) and (means[1] >= means[2]):
+            #     f_out.write('\t\\rowcolor{cyan} \n')
+            #
+            # elif (means[2] >= means[0]) and (means[0] >= means[1]):
+            #     f_out.write('\t\\rowcolor{orange} \n')
 
-            if (means[1] > means[0]) and (means[2] > means[1]):
-                 f_out.write('\t\\rowcolor{lime} \n')
 
-            if (means[1] > means[0]) and (means[1] > means[2]):
-                f_out.write('\t\\rowcolor{cyan} \n')
-
-            f_out.write(f'\t{formatted} & {means[0]} & {means[1]} & {means[2]}\\\\ \n')
+            f_out.write(f'\t{formatted} & {means[0]} & {means[1]} & {means[2]}& {means[3]}\\\\ \n')
             f_out.write(f'\t\hline\n')
 
         f_out.write('\end{tabular}\n')
@@ -94,17 +98,18 @@ def write_latex_table(model_parameters, output_file='templates/models.latex'):
 
 
 
-def run_all(args):
+def compare(args):
     models_parameters = {}
 
-    executions = ['/home/ruben/Escritorio/backup_model_server_e60/models',
-    '/home/ruben/Escritorio/backup_model_server_e500/models',
-    '/home/ruben/Escritorio/backup_model_server_e500_nofreeze/models']
+    executions = ['/home/ruben/Escritorio/models_deepcopy/models_e60/models',
+    '/home/ruben/Escritorio/models_deepcopy/models_e500/models',
+    '/home/ruben/Escritorio/models_deepcopy/models_e500_no_freeze/models',
+    '/home/ruben/Escritorio/models_deepcopy/models_e500_cnerve/models']
 
     for model in ARCHITECTURES:
         models_parameters[model] = {}
         for ex in executions:
-            ex_name = ex.split('/')[4]
+            ex_name = ex.split('/')[5]
             models_parameters[model][ex_name] = get_model_parameters(model, model_folder=ex)
 
 
@@ -114,24 +119,5 @@ def run_all(args):
     write_latex_table(models_parameters, output_file='templates/comparison.latex')
 
 
-    # if len(args) == 3:
-    #     model_folder = args[1].split('=')[1]
-    #     out_file = args[2].split('=')[1]
-    #     for model in ARCHITECTURES:
-    #         models_parameters[model] = get_model_parameters(model, model_folder)
-    #     write_latex_table(models_parameters, out_file)
-    # else:
-    #     for model in ARCHITECTURES:
-    #         if not is_computed(model):
-    #             print(f'{model} not computed, launch train process')
-    #             if len(args) == 1:
-    #                 modify_input_architecture(model)
-    #                 os.system("python cac_main.py -tr")
-    #             models_parameters[model] = get_model_parameters(model)
-    #         else:
-    #             print(f'{model} already computed')
-    #     write_latex_table(models_parameters)
-
-
 if __name__ == '__main__':
-    run_all(sys.argv)
+    compare(sys.argv)

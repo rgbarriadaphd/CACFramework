@@ -18,3 +18,5 @@ utils/__pycache__/
 models/
 
 .idea/
+
+utils/constants/__pycache__/
