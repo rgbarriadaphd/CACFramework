@@ -28,17 +28,21 @@ ARCHITECTURES = ['regnet_y_400mf', 'regnet_y_800mf', 'regnet_y_1_6gf', 'regnet_y
 
 # ARCHITECTURES = ['regnet_x_8gf', 'inception_v3','vgg16','resnet18']
 
-def modify_input_architecture(model):
+def modify_train_parameter(parameter, value):
     """
     Change the architecture definition of the train_constants.py file before run
-    :param model: (str) Current architecture
+    :param parameter: (str) Parameter to be replaced
+    :param value: (str) Current architecture
     """
     constants_file = 'constants/train_constants.py'
     new_lines = []
     with open(constants_file, 'r') as f_in:
         for line in f_in.readlines():
-            if line.startswith('ARCHITECTURE'):
-                new_lines.append(f'ARCHITECTURE = "{model}"\n')
+            if line.startswith(parameter):
+                if isinstance(value, str):
+                    new_lines.append(f'{parameter} = "{value}"\n')
+                elif isinstance(value, float):
+                    new_lines.append(f'{parameter} = {value}\n')
             else:
                 new_lines.append(line)
     with open(constants_file, 'w') as f_out:
@@ -116,9 +120,19 @@ def is_computed(model):
 
 def run_all(args):
     models_parameters = dict.fromkeys(ARCHITECTURES)
+    if len(args) == 3 and '-params' in args[1]:
+        parameter = args[1].split('=')[1]
+        values = args[2]
+        values = list(map(float, values[1:-1].split(',')))
+        if parameter == 'LR':
+            # Example:
+            # python run_all.py -params=LR [0.01,0.001,0.0001,0.00001,0.000001,0.0000001,0.00000001,0.000000001]
+            for value in values:
+                modify_train_parameter('LEARNING_RATE', value)
+                os.system("python cac_main.py -tr")
 
     #TODO: rearrange and think options more robust!!!
-    if len(args) == 3:
+    elif len(args) == 3:
         model_folder = args[1].split('=')[1]
         out_file = args[2].split('=')[1]
         for model in ARCHITECTURES:
@@ -129,7 +143,7 @@ def run_all(args):
             if not is_computed(model):
                 print(f'{model} not computed, launch train process')
                 if len(args) == 1:
-                    modify_input_architecture(model)
+                    modify_train_parameter('ARCHITECTURE', model)
                     os.system("python cac_main.py -tr")
                 models_parameters[model] = get_model_parameters(model)
             else:

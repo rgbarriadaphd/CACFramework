@@ -13,14 +13,15 @@ LOG_LEVEL = 'info'
 EPOCHS = 2
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0001
+LR_SCHEDULER = False
 WEIGHT_DECAY = 4e-2
 
-CRITERION = 'NegativeLogLikelihood'  # ['CrossEntropyLoss','NegativeLogLikelihood', 'KLDivergence', 'MarginRanking']
+CRITERION = 'CrossEntropyLoss'  # ['CrossEntropyLoss','NegativeLogLikelihood', 'KLDivergence', 'MarginRanking']
 OPTIMIZER = 'SDG'
 
 # Architecture parameters
 # =======================
-ARCHITECTURE = "vgg16"
+ARCHITECTURE = "resnet34"
 # model architecture supported:
 # ['regnet_y_400mf','regnet_y_800mf','regnet_y_1_6gf','regnet_y_3_2gf','regnet_y_8gf','regnet_y_16gf','regnet_y_32gf',
 # 'regnet_x_400mf','regnet_x_800mf','regnet_x_1_6gf','regnet_x_3_2gf','regnet_x_8gf','regnet_x_16gf','regnet_x_32gf',
@@ -36,7 +37,6 @@ N_CLASSES = 2  # Number of classes (CAC>400, CAC<400)
 CUSTOM_NORMALIZED = True  # Retrieve normalization parameters by analysing input train images
 REQUIRES_GRAD = True  # Allow backprop in pretrained weights
 WEIGHT_INIT = 'Seeded' # Weight init . Supported --> ['KaimingUniform', 'KaimingNormal', 'XavierUniform', 'XavierNormal']
-
 
 # Output parameters
 # =======================

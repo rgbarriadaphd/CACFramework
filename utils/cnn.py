@@ -7,9 +7,8 @@
 Description: Functions to deal with the cnn operations
 """
 
-import os
 import logging
-import logging
+from torch.optim.lr_scheduler import MultiStepLR
 from torchvision import models
 import torch
 from tqdm import tqdm
@@ -20,7 +19,8 @@ from constants.train_constants import *
 from constants.path_constants import *
 from utils.metrics import PerformanceMetrics
 from utils.load_dataset import load_and_transform_data
-
+import ssl
+ssl.SSLContext.verify_mode = ssl.VerifyMode.CERT_OPTIONAL
 
 class Architecture:
     """
@@ -150,6 +150,7 @@ class Architecture:
         elif self._architecture == 'regnet_x_8gf':
             self._model = models.regnet_x_8gf(pretrained=True)
         elif self._architecture == 'regnet_x_16gf':
+            logging.info("Entra en la correcta arquitectura!!!")
             self._model = models.regnet_x_16gf(pretrained=True)
         elif self._architecture == 'regnet_x_32gf':
             self._model = models.regnet_x_32gf(pretrained=True)
@@ -366,14 +367,6 @@ class Architecture:
         elif self._architecture == 'vgg13_bn':
             self._model = models.vgg13_bn(pretrained=self._pretrained)
 
-        print(self._model)
-        for param in self._model.features.parameters():
-            print(param.requires_grad)
-        for param in self._model.classifier.parameters():
-            print(param.requires_grad)
-        for param in self._model.avgpool.parameters():
-            print(param.requires_grad)
-        print("-----------------------------------------------")
         self._index = 6
         self._modify_architecture_classifier()
 
@@ -431,7 +424,6 @@ class Architecture:
             for param in self._model.features.parameters():
                 param.requires_grad = REQUIRES_GRAD
         except:
-            print("------en el except")
             for param in self._model.parameters():
                 param.requires_grad = REQUIRES_GRAD
 
@@ -505,7 +497,10 @@ def train_model(model, device, train_loader, normalization=None):
         Optimizer:       {OPTIMIZER}
     ''')
     # TODO: Parametrize optimizer and criterion
-    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
+    if OPTIMIZER == 'SDG':
+        optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
+    elif OPTIMIZER == 'Adam':
+        optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     if CRITERION == 'NegativeLogLikelihood':
         logging.info('NegativeLogLikelihood criterion')
@@ -520,33 +515,43 @@ def train_model(model, device, train_loader, normalization=None):
         logging.info('CrossEntropy criterion')
         criterion = nn.CrossEntropyLoss()
 
+    if LR_SCHEDULER:
+        scheduler = MultiStepLR(optimizer, milestones=[300, 400, 450], gamma=0.1)
+
     # TODO: Parametrize loss convergence function
     losses = []
     train_accuracies = []
     test_accuracies = []
+
     for epoch in range(EPOCHS):
         model.train(True)
+        running_loss = 0.0
         with tqdm(total=n_train, desc=f'Epoch {epoch + 1}/{EPOCHS}', unit='img') as pbar:
             for i, batch in enumerate(train_loader):
                 sample, ground, file_info = batch
                 sample = sample.to(device=device, dtype=torch.float32)
                 ground = ground.to(device=device, dtype=torch.long)
 
+                # Normally defined in BATCH_SIZE constant but last batch may contain less samples.
+                current_batch_size = sample.size(0)
                 optimizer.zero_grad()
                 prediction = model(sample)
 
                 if ARCHITECTURE == 'inception_v3':
                     prediction = prediction.logits
 
-                print(prediction.size())
-                print(ground.size())
                 loss = criterion(prediction, ground)
                 loss.backward()
                 optimizer.step()
 
+                running_loss += loss.item() * current_batch_size
+
                 pbar.set_postfix(**{'loss (batch) ': loss.item()})
                 pbar.update(sample.shape[0])
-        losses.append(loss.item())
+        epoch_loss = running_loss / n_train
+        losses.append(epoch_loss)
+        if LR_SCHEDULER:
+            scheduler.step()
 
         if SAVE_ACCURACY_PLOT:
             logging.info('Evaluate train/test dataset accuracy')
@@ -607,6 +612,8 @@ def evaluate_model(model, test_loader, device, fold_id):
             total += ground.size(0)
             correct += (predicted == ground).sum().item()
 
+    print(ground_array)
+    print(prediction_array)
     pm = PerformanceMetrics(ground=ground_array,
                             prediction=prediction_array,
                             percent=True,
