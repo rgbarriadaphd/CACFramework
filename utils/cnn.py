@@ -516,7 +516,7 @@ def train_model(model, device, train_loader, normalization=None):
         criterion = nn.CrossEntropyLoss()
 
     if LR_SCHEDULER:
-        scheduler = MultiStepLR(optimizer, milestones=[300, 400, 450], gamma=0.1)
+        scheduler = MultiStepLR(optimizer, milestones=[150, 450], gamma=0.1)
 
     # TODO: Parametrize loss convergence function
     losses = []

@@ -10,10 +10,10 @@ LOG_LEVEL = 'info'
 # Train hyperparameters
 # =======================
 
-EPOCHS = 2
+EPOCHS = 500
 BATCH_SIZE = 8
-LEARNING_RATE = 0.0001
-LR_SCHEDULER = False
+LEARNING_RATE = 0.001
+LR_SCHEDULER = True
 WEIGHT_DECAY = 4e-2
 
 CRITERION = 'CrossEntropyLoss'  # ['CrossEntropyLoss','NegativeLogLikelihood', 'KLDivergence', 'MarginRanking']
@@ -21,7 +21,7 @@ OPTIMIZER = 'SDG'
 
 # Architecture parameters
 # =======================
-ARCHITECTURE = "resnet34"
+ARCHITECTURE = "vgg16"
 # model architecture supported:
 # ['regnet_y_400mf','regnet_y_800mf','regnet_y_1_6gf','regnet_y_3_2gf','regnet_y_8gf','regnet_y_16gf','regnet_y_32gf',
 # 'regnet_x_400mf','regnet_x_800mf','regnet_x_1_6gf','regnet_x_3_2gf','regnet_x_8gf','regnet_x_16gf','regnet_x_32gf',
@@ -42,7 +42,7 @@ WEIGHT_INIT = 'Seeded' # Weight init . Supported --> ['KaimingUniform', 'Kaiming
 # =======================
 SAVE_MODEL = False  # True if model has to be saved
 SAVE_LOSS_PLOT = True  # True if loss plot has to be saved
-SAVE_ACCURACY_PLOT = False  # True if accuracy plot has to be saved
+SAVE_ACCURACY_PLOT = True  # True if accuracy plot has to be saved
 MONO_FOLD = False  # Run only first Fold (for test)
 FOLDS = '4' # Run all folds or specify '1' .. '5'
 ND = 2  # Number of decimals at outputs
